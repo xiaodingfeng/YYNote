@@ -1,0 +1,182 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_IN_PAGE_ERROR (0xc0000006) at pc=0x0000000072295f19, pid=5624, tid=0x00000000000021b8
+#
+# JRE version: OpenJDK Runtime Environment (8.0_212-b04) (build 1.8.0_212-release-1586-b04)
+# Java VM: OpenJDK 64-Bit Server VM (25.212-b04 mixed mode windows-amd64 compressed oops)
+# Problematic frame:
+# C  [msvcr100.dll+0x35f19]
+#
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+# If you would like to submit a bug report, please visit:
+#   
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000000016096800):  VMThread [stack: 0x0000000017130000,0x0000000017230000] [id=8632]
+
+siginfo: ExceptionCode=0xc0000006, ExceptionInformation=0x0000000000000000 0x0000000072ad8ab4 0x00000000c0000483 
+
+Registers:
+RAX=0x000015b3bfd7d442, RBX=0x0000000072ad8ab4, RCX=0x0000000072ad8ab4, RDX=0x0000000000000025
+RSP=0x000000001722e608, RBP=0x000000001722f050, RSI=0x000000001722eeb0, RDI=0x000000001722ee40
+R8 =0x0000000072aae810, R9 =0x000000001722eeb0, R10=0x0000000000000029, R11=0x000000001722ee28
+R12=0x00000000026734b0, R13=0x0000000002673420, R14=0x0000000000000000, R15=0x0000000002660d50
+RIP=0x0000000072295f19, EFLAGS=0x0000000000010206
+
+Top of Stack: (sp=0x000000001722e608)
+0x000000001722e608:   00000000727135d3 0000000000000000
+0x000000001722e618:   0000000000000000 0000000002673420
+0x000000001722e628:   0000000000000028 000000001722eeb0
+0x000000001722e638:   000000007271374e 000000001722e660
+0x000000001722e648:   00000000026734b0 000000001722f050
+0x000000001722e658:   0000000000000000 656220706165487b
+0x000000001722e668:   2043472065726f66 697461636f766e69
+0x000000001722e678:   282033353d736e6f 3a2935206c6c7566
+0x000000001722e688:   000000000000000a 0000000000000000
+0x000000001722e698:   0000000000000000 0000000000000000
+0x000000001722e6a8:   0000000000000000 0000000000000000
+0x000000001722e6b8:   0000000000000000 0000000000000000
+0x000000001722e6c8:   0000000000000000 0000000000000000
+0x000000001722e6d8:   0000000000000000 0000000000000000
+0x000000001722e6e8:   0000000000000000 0000000000000000
+0x000000001722e6f8:   0000000000000000 0000000000000000 
+
+Instructions: (pc=0x0000000072295f19)
+0x0000000072295ef9:   48 8b d0 e8 5f 60 00 00 33 c0 48 83 c4 20 5b c3
+0x0000000072295f09:   cc cc cc cc cc cc cc eb 07 3a c2 74 0d 48 ff c1
+0x0000000072295f19:   8a 01 84 c0 75 f3 3a c2 75 04 48 8b c1 c3 33 c0
+0x0000000072295f29:   c3 cc cc cc cc cc cc 48 83 ec 38 48 8b 05 bd d5 
+
+
+Register to memory mapping:
+
+RAX=0x000015b3bfd7d442 is an unknown value
+RBX=0x0000000072ad8ab4 is an unknown value
+RCX=0x0000000072ad8ab4 is an unknown value
+RDX=0x0000000000000025 is an unknown value
+RSP=0x000000001722e608 is an unknown value
+RBP=0x000000001722f050 is an unknown value
+RSI=0x000000001722eeb0 is an unknown value
+RDI=0x000000001722ee40 is an unknown value
+R8 =0x0000000072aae810 is an unknown value
+R9 =0x000000001722eeb0 is an unknown value
+R10=0x0000000000000029 is an unknown value
+R11=0x000000001722ee28 is an unknown value
+R12=0x00000000026734b0 is an unknown value
+R13=0x0000000002673420 is an unknown value
+R14=0x0000000000000000 is an unknown value
+R15=0x0000000002660d50 is an unknown value
+
+
+Stack: [0x0000000017130000,0x0000000017230000],  sp=0x000000001722e608,  free space=1017k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [msvcr100.dll+0x35f19]
+
+VM_Operation (0x000000002948dac0): ParallelGCFailedAllocation, mode: safepoint, requested by thread 0x0000000018489000
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x0000000018485000 JavaThread "ForkJoinPool.commonPool-worker-0" daemon [_thread_blocked, id=5608, stack(0x000000002a060000,0x000000002a160000)]
+  0x0000000018489000 JavaThread "WorkerExecutor Queue Thread 4" [_thread_blocked, id=2464, stack(0x0000000029390000,0x0000000029490000)]
+  0x000000001d44e800 JavaThread "Cache worker for Java compile cache (C:\Users\XiaoBai\Desktop\Android\YYNote\.gradle\5.6.4\javaCompile)" [_thread_blocked, id=6596, stack(0x0000000027c80000,0x0000000027d80000)]
+  0x000000001d452000 JavaThread "WorkerExecutor Queue Thread 3" [_thread_blocked, id=8156, stack(0x00000000277a0000,0x00000000278a0000)]
+  0x000000001d451800 JavaThread "WorkerExecutor Queue Thread 2" [_thread_blocked, id=3928, stack(0x0000000027280000,0x0000000027380000)]
+  0x000000001d450800 JavaThread "stdout" [_thread_in_native, id=8324, stack(0x0000000026f80000,0x0000000027080000)]
+  0x000000001d443000 JavaThread "stderr" [_thread_in_native, id=4496, stack(0x0000000022d40000,0x0000000022e40000)]
+  0x000000001d44a000 JavaThread "pool-40-thread-1" [_thread_blocked, id=9140, stack(0x0000000022a00000,0x0000000022b00000)]
+  0x000000001d448800 JavaThread "WorkerExecutor Queue" [_thread_blocked, id=3112, stack(0x0000000022450000,0x0000000022550000)]
+  0x000000001d446000 JavaThread "Cache worker for execution history cache (C:\Users\XiaoBai\Desktop\Android\YYNote\.gradle\5.6.4\executionHistory)" [_thread_blocked, id=9184, stack(0x0000000022250000,0x0000000022350000)]
+  0x00000000192e5800 JavaThread "Execution worker for ':' Thread 3" [_thread_blocked, id=7444, stack(0x0000000021f50000,0x0000000022050000)]
+  0x00000000192dd000 JavaThread "Execution worker for ':' Thread 2" [_thread_blocked, id=4620, stack(0x0000000021e50000,0x0000000021f50000)]
+  0x00000000192dc800 JavaThread "Execution worker for ':'" [_thread_blocked, id=1976, stack(0x0000000021750000,0x0000000021850000)]
+  0x00000000192de800 JavaThread "Cache worker for file content cache (C:\Users\XiaoBai\Desktop\Android\YYNote\.gradle\5.6.4\fileContent)" [_thread_blocked, id=2672, stack(0x0000000020a50000,0x0000000020b50000)]
+  0x00000000192e3000 JavaThread "Cache worker for Build Output Cleanup Cache (C:\Users\XiaoBai\Desktop\Android\YYNote\.gradle\buildOutputCleanup)" [_thread_blocked, id=5316, stack(0x0000000020350000,0x0000000020450000)]
+  0x00000000192e2800 JavaThread "Build operations Thread 4" [_thread_blocked, id=7828, stack(0x0000000020250000,0x0000000020350000)]
+  0x00000000192e1800 JavaThread "Build operations Thread 3" [_thread_blocked, id=2284, stack(0x0000000020150000,0x0000000020250000)]
+  0x00000000192e1000 JavaThread "Build operations Thread 2" [_thread_blocked, id=4404, stack(0x000000001ed20000,0x000000001ee20000)]
+  0x00000000192d6800 JavaThread "Build operations" [_thread_blocked, id=3488, stack(0x000000001ec20000,0x000000001ed20000)]
+  0x00000000192d9800 JavaThread "Cache worker for cache directory md-rule (C:\Users\XiaoBai\.gradle\caches\5.6.4\md-rule)" [_thread_blocked, id=8924, stack(0x000000001eb20000,0x000000001ec20000)]
+  0x00000000192db800 JavaThread "Cache worker for cache directory md-supplier (C:\Users\XiaoBai\.gradle\caches\5.6.4\md-supplier)" [_thread_blocked, id=4976, stack(0x000000001de20000,0x000000001df20000)]
+  0x00000000192d8800 JavaThread "Cache worker for file hash cache (C:\Users\XiaoBai\Desktop\Android\YYNote\.gradle\5.6.4\fileHashes)" [_thread_blocked, id=8932, stack(0x000000001a5b0000,0x000000001a6b0000)]
+  0x000000001c38b000 JavaThread "Thread-386" [_thread_blocked, id=4004, stack(0x000000001a2b0000,0x000000001a3b0000)]
+  0x000000001c38a000 JavaThread "Stdin handler" [_thread_blocked, id=7112, stack(0x000000001a1b0000,0x000000001a2b0000)]
+  0x000000001c388000 JavaThread "Asynchronous log dispatcher for DefaultDaemonConnection: socket connection from /127.0.0.1:52892 to /127.0.0.1:1649" [_thread_blocked, id=7524, stack(0x0000000019eb0000,0x0000000019fb0000)]
+  0x000000001c38e800 JavaThread "Daemon worker Thread 16" [_thread_blocked, id=7364, stack(0x0000000019db0000,0x0000000019eb0000)]
+  0x000000001c38c800 JavaThread "Cancel handler" [_thread_blocked, id=8756, stack(0x0000000018730000,0x0000000018830000)]
+  0x000000001c381000 JavaThread "Handler for socket connection from /127.0.0.1:52892 to /127.0.0.1:1649" [_thread_in_native, id=8428, stack(0x0000000000830000,0x0000000000930000)]
+  0x000000001c382000 JavaThread "Daemon Thread 16" [_thread_blocked, id=8528, stack(0x0000000000730000,0x0000000000830000)]
+  0x000000001d44b800 JavaThread "Cache worker for Java compile cache (C:\Users\XiaoBai\.gradle\caches\5.6.4\javaCompile)" [_thread_blocked, id=7864, stack(0x0000000022350000,0x0000000022450000)]
+  0x000000001c382800 JavaThread "Cache worker for file content cache (C:\Users\XiaoBai\.gradle\caches\5.6.4\fileContent)" [_thread_blocked, id=8004, stack(0x0000000021650000,0x0000000021750000)]
+  0x000000001c385800 JavaThread "Memory manager" [_thread_blocked, id=2412, stack(0x0000000021550000,0x0000000021650000)]
+  0x000000001c387000 JavaThread "Cache worker for execution history cache (C:\Users\XiaoBai\.gradle\caches\5.6.4\executionHistory)" [_thread_blocked, id=2888, stack(0x000000001ee80000,0x000000001ef80000)]
+  0x0000000018487800 JavaThread "Cache worker for journal cache (C:\Users\XiaoBai\.gradle\caches\journal-1)" [_thread_blocked, id=8772, stack(0x000000001aab0000,0x000000001abb0000)]
+  0x0000000018488800 JavaThread "File lock request listener" [_thread_in_native, id=8104, stack(0x000000001a9b0000,0x000000001aab0000)]
+  0x00000000182d6000 JavaThread "Cache worker for file hash cache (C:\Users\XiaoBai\.gradle\caches\5.6.4\fileHashes)" [_thread_blocked, id=8936, stack(0x000000001a8b0000,0x000000001a9b0000)]
+  0x000000001746f800 JavaThread "Daemon periodic checks" [_thread_blocked, id=1392, stack(0x0000000019cb0000,0x0000000019db0000)]
+  0x0000000017472000 JavaThread "Incoming local TCP Connector on port 52892" [_thread_in_native, id=7896, stack(0x0000000019b00000,0x0000000019c00000)]
+  0x000000001964b000 JavaThread "Daemon health stats" [_thread_blocked, id=752, stack(0x0000000019800000,0x0000000019900000)]
+  0x00000000174b4800 JavaThread "Service Thread" daemon [_thread_blocked, id=9164, stack(0x0000000017d30000,0x0000000017e30000)]
+  0x0000000017485800 JavaThread "C1 CompilerThread2" daemon [_thread_blocked, id=2948, stack(0x0000000017c30000,0x0000000017d30000)]
+  0x0000000017482000 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=6208, stack(0x0000000017b30000,0x0000000017c30000)]
+  0x000000001612a000 JavaThread "C2 CompilerThread0" daemon [_thread_blocked, id=6716, stack(0x0000000017a30000,0x0000000017b30000)]
+  0x00000000160de000 JavaThread "Attach Listener" daemon [_thread_blocked, id=8656, stack(0x0000000017930000,0x0000000017a30000)]
+  0x0000000017438800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=7784, stack(0x0000000017830000,0x0000000017930000)]
+  0x000000000275a800 JavaThread "Finalizer" daemon [_thread_blocked, id=8524, stack(0x0000000017330000,0x0000000017430000)]
+  0x0000000002752000 JavaThread "Reference Handler" daemon [_thread_blocked, id=6088, stack(0x0000000017230000,0x0000000017330000)]
+  0x0000000002662800 JavaThread "main" [_thread_blocked, id=8888, stack(0x00000000021a0000,0x00000000022a0000)]
+
+Other Threads:
+=>0x0000000016096800 VMThread [stack: 0x0000000017130000,0x0000000017230000] [id=8632]
+  0x00000000174b5000 WatcherThread [stack: 0x0000000017e30000,0x0000000017f30000] [id=7260]
+
+VM state:at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x000000000219e0a0] Threads_lock - owner thread: 0x0000000016096800
+[0x000000000219e220] Heap_lock - owner thread: 0x0000000018489000
+
+heap address: 0x00000000a0000000, size: 1536 MB, Compressed Oops mode: 32-bit
+Narrow klass base: 0x0000000000000000, Narrow klass shift: 3
+Compressed class space size: 1073741824 Address: 0x0000000100000000
+
+Heap:
+ PSYoungGen      total 393216K, used 334048K [0x00000000e0000000, 0x00000000fea80000, 0x0000000100000000)
+  eden space 317952K, 99% used [0x00000000e0000000,0x00000000f36776b0,0x00000000f3680000)
+  from space 75264K, 21% used [0x00000000f3680000,0x00000000f4640a28,0x00000000f8000000)
+  to   space 72704K, 0% used [0x00000000fa380000,0x00000000fa380000,0x00000000fea80000)
+ ParOldGen       total 145920K, used 84233K [0x00000000a0000000, 0x00000000a8e80000, 0x00000000e0000000)
+  object space 145920K, 57% used [0x00000000a0000000,0x00000000a5242768,0x00000000a8e80000)
+ Metaspace       used 95795K, capacity 102538K, committed 102784K, reserved 1138688K
+  class space    used 12183K, capacity 13366K, committed 13440K, reserved 1048576K
+
+Card table byte_map: [0x0000000011b20000,0x0000000011e30000] byte_map_base: 0x0000000011620000
+
+Marking Bits: (ParMarkBitMap*) 0x0000000072c89f30
+ Begin Bits: [0x0000000012430000, 0x0000000013c30000)
+ End Bits:   [0x0000000013c30000, 0x0000000015430000)
+
+Polling page: 0x0000000000550000
+
+CodeCache: size=245760Kb used=68464Kb max_used=68468Kb free=177295Kb
+ bounds [0x0000000002760000, 0x0000000006ab0000, 0x0000000011760000]
+ total_blobs=19907 nmethods=19030 adapters=789
+ compilation: enabled
+
+Compilation events (10 events):
+Event: 6178.962 Thread 0x0000000017485800 25440  s!   3       com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser::setFeature (129 bytes)
+Event: 6178.966 Thread 0x0000000017485800 nmethod 25440 0x0000000006a86f50 code [0x0000000006a87160, 0x0000000006a87c08]
+Event: 6178.971 Thread 0x0000000017485800 25441       3       java.util.stream.SortedOps$RefSortingSink::end (126 bytes)
+Event: 6178.977 Thread 0x0000000017485800 nmethod 25441 0x0000000006a85510 code [0x0000000006a85780, 0x0000000006a86878]
+Event: 6179.013 Thread 0x000000001612a000 25442       4       com.android.apksig.DefaultApkSignerEngine::isDebuggable (22 bytes)
+Event: 6179.015 Thread 0x000000001612a000 nmethod 25442 0x0000000003732b50 code [0x0000000003732c80, 0x0000000003732cf8]
+Event: 6179.391 Thread 0x0000000017485800 25443       3       com.android.apksig.internal.asn1.Asn1DerEncoder$$Lambda$479/1037006479::compare (12 bytes)
+Event: 6179.393 Thread 0x0000000017485800 nmethod 25443 0x0000000006aa2110 code [0x0000000006aa22c0, 0x0000000006aa2898]
+Event: 6179.393 Thread 0x0000000017485800 25444       3       com.android.apksig.internal.asn1.Asn1DerEncoder::lambda$toSequence$0 (20 bytes)
+Event: 6179.394 Thread 0x0000000017485800 nmethod 25444 0x0000000006a84290 code [0x0000000006a84480, 0x0000000006a84f38]
+
