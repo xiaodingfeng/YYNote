@@ -11,4 +11,9 @@
         android:orderInCategory="100"
         android:title="@string/grid_model"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/Article"
+        android:orderInCategory="100"
+        android:title="轻阅读"
+        app:showAsAction="never" />
 </menu>

@@ -290,6 +290,9 @@ public class MainActivity extends AppCompatActivity
             editor.putString("ShowNotesModel",showNotesModel);
             editor.apply();         //editor.commit();
             refreshLayoutManager();
+        }else if(id==R.id.Article){
+            Intent intent = new Intent(MainActivity.this, Meiwen.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
