@@ -38,8 +38,6 @@ public class Meiwen extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void handleMessage(Message msg) {
-                textView.setText("handleMessage。。。");
-                textView1.setText("handleMessage。。。");
                 if (msg.what == 1) {
                     Article news = newsList.get(0);
                     textView.setText(news.getArticleTitle()+"\n"+news.getArticleWho());
@@ -62,6 +60,7 @@ public class Meiwen extends AppCompatActivity {
                     textView.setText("加载中。。。");
                     textView1.setText("加载中。。。");
                    Document doc = Jsoup.connect("http://www.xiaole8.com/renshengzheli/page_"+Integer.toString(i)+".html").get();
+                    textView1.setText(doc.text());
                    Elements titleLinks = doc.select("ul.l2");    //解析来获取每条新闻的标题与链接地址
                     Elements titlelins = titleLinks.get(0).select("li");
                     int j= (int) (Math.random() * titlelins.size());

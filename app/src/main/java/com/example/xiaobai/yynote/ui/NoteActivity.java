@@ -223,8 +223,12 @@ public class NoteActivity extends AppCompatActivity {
             Intent intent = new Intent(NoteActivity.this,AlarmReceiver.class);
             intent.putExtra("NoteContent",note.getContent());
             pi = PendingIntent.getBroadcast(NoteActivity.this,0,intent,0);
-            //alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+5000, pi);
             setReminder();
+        }
+        else if(id==R.id.show_menu_remindcancel){
+            if(alarmManager!=null)
+            alarmManager.cancel(pi);
+            Toast.makeText(NoteActivity.this, "取消提醒成功！", Toast.LENGTH_SHORT).show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -257,129 +261,12 @@ public class NoteActivity extends AppCompatActivity {
             @Override
             public void OnDateTimeSet(android.app.AlertDialog dialog, long date) {
                 date1 = date;
+                alarmManager.set(AlarmManager.RTC_WAKEUP, date1,pi);
+                Toast.makeText(NoteActivity.this, "设置提醒成功！", Toast.LENGTH_SHORT).show();
+                Log.d("时间","时间是" + date1);
             }
         });
         d.show();
-
-        alarmManager.set(AlarmManager.RTC_WAKEUP, date1, pi);
-        Log.d("时间","时间是" + date1);
-
-
-        /*
-        Calendar currentTime = Calendar.getInstance();
-        new TimePickerDialog(NoteActivity.this, 0, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
-                Calendar c = Calendar.getInstance();
-                c.setTimeInMillis(System.currentTimeMillis());
-                c.set(Calendar.HOUR, hourOfDay);
-                c.set(Calendar.MINUTE, minute);
-                alarmManager.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pi);
-                Log.e("HEHE",c.getTimeInMillis()+"");
-                Toast.makeText(NoteActivity.this, "闹钟设置完毕~"+ c.getTimeInMillis(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        }, currentTime.get(Calendar.HOUR_OF_DAY), currentTime.get(Calendar.MINUTE), false).show();
-         */
     }
 
-
-
-
-    /*  在工具类的 ContentToSpannableString实现了，方便复用
-    //这里传入 note content（string） 其中格式如下 你好，<img src=''>， <voice src=''> 经过处理后 得到一个spannableString ，将其中的img he
-    //voice setSpan变为两个标志，之后textView .set 就会将其还原
-    private SpannableString handleNoteString(String noteContent){
-
-        //这里的fakeNoteContent 是虚假content，是展示给用户的，因为真正的content中包含着的声音src变为可点击spannable之后会很丑
-        String fakeNoteContent = noteContent;
-        ArrayList<String> voiceSrc = new ArrayList<>();
-        Pattern voice = Pattern.compile("<voice src='(.*?)'/>");
-        Matcher mVoice = voice.matcher(noteContent);
-        while(mVoice.find()){
-            String str1 = mVoice.group(0);
-            fakeNoteContent = noteContent.replace(str1,"");
-            String str2 = mVoice.group(1);
-            voiceSrc.add(str2);
-        }
-
-        Log.d("voiceSrc的大小",Integer.toString(voiceSrc.size()));
-
-        Pattern img = Pattern.compile("<img src='(.*?)'/>");
-        Matcher mImg = img.matcher(fakeNoteContent);
-
-        // "\uD83C\uDFA4", 这是android手机的emoji录音图标
-        Pattern voiceLogo = Pattern.compile("\uD83C\uDFA4");
-        Matcher mVoiceLogo = voiceLogo.matcher(fakeNoteContent);
-
-        SpannableString spanStr = new SpannableString(fakeNoteContent);
-
-        while(mImg.find()){
-            String str = mImg.group(0);
-            int start = mImg.start();   int end = mImg.end();
-            Uri imgUri = Uri.parse(mImg.group(1));
-            Drawable drawable = null;
-            try {
-                drawable = Drawable.createFromStream(this.getContentResolver().openInputStream(imgUri),null);
-                drawable.setBounds(0,0,2 * drawable.getIntrinsicWidth(),2 * drawable.getIntrinsicHeight());
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            ImageSpan imageSpan = new ImageSpan(drawable);
-
-            spanStr.setSpan(imageSpan,start,end,Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        }
-
-        int i = 0;
-        while(mVoiceLogo.find()){
-
-            Log.d("下标i",Integer.toString(i));
-            int start = mVoiceLogo.start();     int end = mVoiceLogo.end();
-            final String voiceFilePath = voiceSrc.get(i);
-            i++;
-
-            //可点击的SpannableString
-            ClickableSpan clickableSpan = new ClickableSpan() {
-                @Override
-                public void onClick(View view) {
-                    //实现点击事件
-                    Log.d("voice能否点击","能够点击");
-                    MediaPlayer mp = new MediaPlayer();
-                    try {
-                        mp.setDataSource(voiceFilePath);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    //mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                    mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mediaPlayer) {
-                            if(mediaPlayer != null){
-                                mediaPlayer.stop();
-                                mediaPlayer.release();
-                                mediaPlayer = null;
-                            }
-
-                        }
-                    });
-
-                    try {
-                        mp.prepare();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    mp.start();
-                    //etc
-                }
-            };
-            spanStr.setSpan(clickableSpan,start,end,Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-
-            //不加下面这句点击没反应
-            textView.setMovementMethod(LinkMovementMethod.getInstance());
-        }
-
-        return spanStr;
-    }
-
-    */
 }
