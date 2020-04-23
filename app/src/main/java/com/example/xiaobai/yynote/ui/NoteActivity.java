@@ -253,7 +253,7 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void setReminder(){
-
+//提交测试
 
         //不知道是什么鬼原理，方正成功了，，醉了，下面的dialog的构造函数的System.currentTimeMillis() 就是 显示在用户dialog上面的基础时间
         DateTimePickerDialog d = new DateTimePickerDialog(this,System.currentTimeMillis());
