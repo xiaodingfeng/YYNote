@@ -50,7 +50,32 @@ public class Meiwen extends AppCompatActivity {
             }
         };
     }
-
+    public static Document getJsoupDocGet(String url) {
+        //三次试错
+        final int MAX = 10;
+        int time = 0;
+        Document doc = null;
+        while (time < MAX) {
+            try {
+                doc = Jsoup
+                        .connect(url)
+                        .ignoreContentType(true)
+                        .ignoreHttpErrors(true)
+                        .timeout(1000 * 30)
+                        .userAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36")
+                        .header("accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+                        .header("accept-encoding","gzip, deflate, br")
+                        .header("accept-language","zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7")
+                        .get();
+                return doc;
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                time++;
+            }
+        }
+        return doc;
+    }
     private void getNews(){
         new Thread(new Runnable() {
             @Override
@@ -59,7 +84,9 @@ public class Meiwen extends AppCompatActivity {
                    int i= (int) (Math.random() * 36);
                     textView.setText("加载中。。。");
                     textView1.setText("加载中。。。");
-                   Document doc = Jsoup.connect("http://www.xiaole8.com/renshengzheli/page_"+Integer.toString(i)+".html").get();
+//                    Document doc = Jsoup.connect("http://www.xiaole8.com/renshengzheli/page_"+Integer.toString(i)+".html").userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36").timeout(3000).post();
+//                   Document doc = Jsoup.connect("http://www.xiaole8.com/renshengzheli/page_"+Integer.toString(i)+".html").get();
+                    Document doc =getJsoupDocGet("http://www.xiaole8.com/renshengzheli/page_"+Integer.toString(i)+".html");
                     textView1.setText(doc.text());
                    Elements titleLinks = doc.select("ul.l2");    //解析来获取每条新闻的标题与链接地址
                     Elements titlelins = titleLinks.get(0).select("li");
