@@ -7,12 +7,12 @@ public class Article   {
     private String ArticleWho;    //来源
     private String Content;
 
-    public Article(String ArticleTitle, String ArticleUrl, String ArticleWho,String Content) {
-        this.ArticleTitle = ArticleTitle;
-        this.ArticleUrl = ArticleUrl;
-        this.ArticleWho = ArticleWho;
-        this.Content=Content;
-    }
+//    public Article(String ArticleTitle, String ArticleUrl, String ArticleWho,String Content) {
+//        this.ArticleTitle = ArticleTitle;
+//        this.ArticleUrl = ArticleUrl;
+//        this.ArticleWho = ArticleWho;
+//        this.Content=Content;
+//    }
 
 
     public String getArticleWho() {
@@ -30,7 +30,9 @@ public class Article   {
     public void setArticleTitle(String newsTitle) {
         this.ArticleTitle = newsTitle;
     }
-
+    public void setArticleContent(String newsContent) {
+        this.Content = newsContent;
+    }
     public String getArticleUrl() {
         return ArticleUrl;
     }

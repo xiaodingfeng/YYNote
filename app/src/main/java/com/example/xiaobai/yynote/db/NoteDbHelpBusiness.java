@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.view.ViewDebug;
+
 import com.example.xiaobai.yynote.adapter.NoteAdapter;
 import com.example.xiaobai.yynote.bean.Note;
 

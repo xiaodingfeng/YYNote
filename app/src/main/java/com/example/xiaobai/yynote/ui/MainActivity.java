@@ -6,52 +6,64 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.os.Handler;
+import android.os.Message;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.xiaobai.yynote.R;
 import com.example.xiaobai.yynote.adapter.NoteAdapter;
 import com.example.xiaobai.yynote.bean.Note;
+import com.example.xiaobai.yynote.bean.WeatherApi;
 import com.example.xiaobai.yynote.db.NoteDbHelpBusiness;
-import com.example.xiaobai.yynote.util.GlideImageEngine;
+import com.example.xiaobai.yynote.util.NetworkUtil;
 import com.example.xiaobai.yynote.view.SpacesItemDecoration;
 import com.simple.spiderman.CrashModel;
 import com.simple.spiderman.SpiderMan;
 
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener ,View.OnClickListener {
     NoteAdapter noteAdapter;
     NoteDbHelpBusiness dbBus;
+    NetworkUtil networkUtil;
+    private Handler handler;
+//    WeatherInfo weatherInfo;
     private LinkedList<Note> notes;
     private String groupName = "全部";
     public  Toolbar toolbar_main;
     ImageView imageView;
     String showNotesModel;
     RecyclerView recyclerView;
+
     public void onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
     }
+    @SuppressLint({"SetTextI18n", "HandlerLeak", "WrongConstant"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,6 +82,10 @@ public class MainActivity extends AppCompatActivity
                         //CrashModel 崩溃信息记录，包含设备信息
                     }
                 });
+        if(!NetworkUtil.isNetworkConnected(this))
+            Toast.makeText(this, "网络不可用", 0).show();
+        else
+            Toast.makeText(this, "网络可用", 0).show();
          toolbar_main = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar_main);
         //用户喜好  首页面 notes布局显示  第一次默认 宫格模式
@@ -201,36 +217,98 @@ public class MainActivity extends AppCompatActivity
         //调用getHeaderView方法获得Header
         View headerView = navigationView.getHeaderView(0);
         //通过Header来获取自定义控件
-        imageView=(ImageView)headerView.findViewById(R.id.imageView) ;
-        //会报错，路径会加密出错
-//        try {
-//            if (dbBus.seletimage() != null)
-//                imageView.setImageURI(Uri.parse((String) dbBus.seletimage()));
-//        }
-//        catch (Exception e){
-//            throw e;
-//        }
-        imageView.setOnClickListener(new View.OnClickListener() {
+//        imageView=(ImageView)headerView.findViewById(R.id.imageView) ;
+//        //会报错，路径会加密出错
+////        try {
+////            if (dbBus.seletimage() != null)
+////                imageView.setImageURI(Uri.parse((String) dbBus.seletimage()));
+////        }
+////        catch (Exception e){
+////            throw e;
+////        }
+//        imageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(Intent.ACTION_PICK, null);
+//                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+//                startActivityForResult(intent, 2);
+//            }
+//        });
+        final TextView textView1=(TextView)headerView.findViewById(R.id.textView2);//date
+        final TextView textView2=(TextView)headerView.findViewById(R.id.textView1);//city
+        final TextView textView3=(TextView)headerView.findViewById(R.id.textView);//wen
+        final TextView textView4=(TextView)headerView.findViewById(R.id.textView3);//Pm
+        final TextView textView5=(TextView)headerView.findViewById(R.id.textView4);//now
+        final TextView textView6=(TextView)headerView.findViewById(R.id.textView5);//Tianqi
+        new Thread(networkTask).start();
+        handler = new Handler() {
+            @SuppressLint("SetTextI18n")
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_PICK, null);
-                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-                startActivityForResult(intent, 2);
+            public void handleMessage(Message msg) {
+                if (msg.what == 1) {
+                    textView1.setText(textView1.getText()+(WeatherApi.weatherInfo.getDate()==null?"获取失败":WeatherApi.weatherInfo.getDate()));
+                    textView2.setText(textView2.getText()+(WeatherApi.weatherInfo.getCityname()==null?"获取失败":WeatherApi.weatherInfo.getCityname()));
+                    textView3.setText(textView3.getText()+(WeatherApi.weatherInfo.getTemperature()==null?"获取失败":WeatherApi.weatherInfo.getTemperature()));
+                    textView4.setText(textView4.getText()+(WeatherApi.weatherInfo.getAirquality()==null?"获取失败":WeatherApi.weatherInfo.getAirquality()));
+                    textView5.setText(textView5.getText()+(WeatherApi.weatherInfo.gettemperatureNow()==null?"获取失败":WeatherApi.weatherInfo.gettemperatureNow()));
+                    textView6.setText(textView6.getText()+(WeatherApi.weatherInfo.getWeather()==null?"获取失败":WeatherApi.weatherInfo.getWeather()));
+                }
+                else if(msg.what == 0){
+                    textView1.setText(textView1.getText()+"获取超时");
+                    textView2.setText(textView2.getText()+"获取超时");
+                    textView3.setText(textView3.getText()+"获取超时");
+                    textView4.setText(textView4.getText()+"获取超时");
+                    textView5.setText(textView5.getText()+"获取超时");
+                    textView6.setText(textView6.getText()+"获取超时");
+                }
+
             }
-        });
+        };
     }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (requestCode == 2) {
-            // 从相册返回的数据
-            if (data != null) {
-                // 得到图片的全路径
-                Uri uri = data.getData();
-                imageView.setImageURI(uri);
-                dbBus.updateImage(uri.toString());
+    /**
+     * 网络操作相关的子线程
+     */
+    Runnable networkTask = new Runnable() {
+
+        @Override
+        public void run() {
+            // TODO
+            // 在这里进行 http request.网络请求相关操作
+            try {
+                WeatherApi wh = new WeatherApi("https://www.toutiao.com/stream/widget/local_weather/data/", "http://whois.pconline.com.cn/");
+                if (wh.JsonWeather()) {
+                    Message msg = new Message();
+//            Bundle data = new Bundle();
+//            data.putString("value", "请求结果");
+                    msg.what = 1;
+                    handler.sendMessage(msg);
+                }
+                else{
+                    Message msg = new Message();
+//            Bundle data = new Bundle();
+//            data.putString("value", "请求结果");
+                    msg.what = 0;
+                    handler.sendMessage(msg);
+                }
+
+            }
+            catch (Exception e){
+//                textView1.setText(textView1.getText()+e.toString());
             }
         }
-    }
+    };
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+//        if (requestCode == 2) {
+//            // 从相册返回的数据
+//            if (data != null) {
+//                // 得到图片的全路径
+//                Uri uri = data.getData();
+//                imageView.setImageURI(uri);
+//                dbBus.updateImage(uri.toString());
+//            }
+//        }
+//    }
 
 
     // 根据组名groupName 刷新数据  notes 对象 ，由于groupName的变化，或者其他增删导致 数据变化 ,合理并不会对搜索框的过滤刷新
@@ -342,13 +420,13 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_aboutWriter) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             AlertDialog alertDialog = builder.setTitle("关于作者：")
-                    .setMessage("华东交通大学\n\n肖定峰\n李永祺").create();
+                    .setMessage("华东交通大学\n\n肖定峰").create();
             alertDialog.show();
         }
         else if(id == R.id.nav_aboutApp){
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             AlertDialog alertDialog = builder.setTitle("帮助文档")
-                    .setMessage("书写便签时，直接返回也可保存便签\n\n非回收站便签长按可删除，加入回收站\n\n回收站便签长按可恢复，也可永久删除\n\n便签内页可设置提醒功能，设置文字大小").create();
+                    .setMessage("书写便签时，直接返回也可保存便签\n\n非回收站便签长按可删除，加入回收站\n\n回收站便签长按可恢复，也可永久删除\n\n便签内页可设置提醒功能，取消提醒，设置文字大小，移动分组\n\n主界面菜单设置轻阅读，左滑或者右滑随机一篇美文\n\n左侧分组目录头添加天气，需要移动网络才能准确定位").create();
             alertDialog.show();
         }
 

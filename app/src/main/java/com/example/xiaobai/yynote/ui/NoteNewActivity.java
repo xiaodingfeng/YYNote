@@ -1,29 +1,39 @@
 package com.example.xiaobai.yynote.ui;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.database.Cursor;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import android.provider.MediaStore;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.format.DateFormat;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,21 +41,19 @@ import android.widget.EditText;
 import com.example.xiaobai.yynote.R;
 import com.example.xiaobai.yynote.bean.Note;
 import com.example.xiaobai.yynote.db.NoteDbHelpBusiness;
-import com.example.xiaobai.yynote.db.NotesDatabaseHelper;
 import com.example.xiaobai.yynote.util.CommonUtil;
 import com.example.xiaobai.yynote.util.ContentToSpannableString;
 import com.example.xiaobai.yynote.util.GlideImageEngine;
 import com.example.xiaobai.yynote.util.UriToPathUtil;
-import com.simple.spiderman.CrashModel;
-import com.simple.spiderman.SpiderMan;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,7 +68,6 @@ public class NoteNewActivity extends AppCompatActivity {
     private boolean isStart = false;      //判断是否开始录音
     private MediaRecorder mediaRecorder = null;
     private int REQUEST_PERMISSION_CODE;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,12 +89,10 @@ public class NoteNewActivity extends AppCompatActivity {
         toolbar_note_new.setNavigationOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                if(!editText.getText().toString().equals("")) {
                     //向数据库中新增一条Note数据
                     closeSoftKeyInput();
                     editLoseFocus();
                     AddNote();
-                }
                 finish();
             }
         });
@@ -100,7 +105,6 @@ public class NoteNewActivity extends AppCompatActivity {
             oldNote = (Note)bundle.getSerializable("OldNote");
             SpannableString spannableString = ContentToSpannableString.Content2SpanStr(NoteNewActivity.this, oldNote.getContent());
             editText.append(spannableString);
-
             /*
             此时如果用户只是进来看一眼，就不应该删除。
             NoteDbHelpBusiness dbHelpBusiness = NoteDbHelpBusiness.getInstance(this);
@@ -114,18 +118,10 @@ public class NoteNewActivity extends AppCompatActivity {
         editGetFocus();
 
 
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(b){
-                    Log.d("焦点","获得焦点");
-                }else{
-                    Log.d("焦点","失去焦点");
-                }
-            }
-        });
+
 
         FloatingActionButton btn_note_complete = findViewById(R.id.button_note_new_complete);
+//        btn_note_complete.setVisibility(View.GONE);
         btn_note_complete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -137,7 +133,8 @@ public class NoteNewActivity extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton addPic = findViewById(R.id.button_note_new_picture);
+        final FloatingActionButton addPic = findViewById(R.id.button_note_new_picture);
+//        addPic.setVisibility(View.GONE);
         addPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -147,7 +144,9 @@ public class NoteNewActivity extends AppCompatActivity {
         });
 
         final Button addVoice = findViewById(R.id.button_note_new_voice);
+//        addVoice.setVisibility(View.GONE);
         addVoice.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
                 if(!isStart){
@@ -162,6 +161,20 @@ public class NoteNewActivity extends AppCompatActivity {
                     //这是手机emoji上的一个图标
                     editText.append("\uD83C\uDFA4");
                     editText.append("\n");
+                }
+            }
+        });
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(b){
+//                    addPic.setVisibility(View.VISIBLE);
+//                    addVoice.setVisibility(View.VISIBLE);
+                    Log.d("焦点","获得焦点");
+                }else{
+//                    addPic.setVisibility(View.GONE);
+//                    addVoice.setVisibility(View.GONE);
+                    Log.d("焦点","失去焦点");
                 }
             }
         });
@@ -194,67 +207,73 @@ public class NoteNewActivity extends AppCompatActivity {
 
     private void AddNote(){
         String mContent = editText.getText().toString();
-        String Contents=mContent;
-        int i = 0;
-        String title;
-        Pattern voice = Pattern.compile("<voice src='(.*?)'/>");
-        Matcher mVoice = voice.matcher(Contents);
-        Contents=mVoice.replaceAll("");
-        Pattern img = Pattern.compile("<img src='(.*?)'/>");
-        Matcher mImg = img.matcher(Contents);
-        Contents=mImg.replaceAll("");
-        int k=0;
-        for(i = 0;i < Contents.length();i++){
-            if (Contents.charAt(i) == '\n'){
-                    if(!Contents.substring(k, i).trim().equals("")) {
+        if(!mContent.equals("")) {
+            String Contents = mContent;
+            int i = 0;
+            String title;
+            Pattern voice = Pattern.compile("<voice src='(.*?)'/>");
+            Matcher mVoice = voice.matcher(Contents);
+            Contents = mVoice.replaceAll("");
+            Pattern img = Pattern.compile("<img src='(.*?)'/>");
+            Matcher mImg = img.matcher(Contents);
+            Contents = mImg.replaceAll("");
+            int k = 0;
+            for (i = 0; i < Contents.length(); i++) {
+                if (Contents.charAt(i) == '\n') {
+                    if (!Contents.substring(k, i).trim().equals("")) {
                         break;
                     }
-                    k=i;
-                }
-        }
-        title = Contents.substring(k,i);
-
-        String subContent;
-        if(i < Contents.length()){
-            int j = 0;
-            for(j = i + 1;j < Contents.length();j++){
-                if(Contents.charAt(j) == '\n'){
-                    if(!Contents.substring(i + 1, j).trim().equals(""))
-                    break;
+                    k = i;
                 }
             }
-            subContent = Contents.substring(i+1,j);
-        }else{
-            subContent = "";
+            title = Contents.substring(k, i);
 
+            String subContent;
+            if (i < Contents.length()) {
+                int j = 0;
+                for (j = i + 1; j < Contents.length(); j++) {
+                    if (Contents.charAt(j) == '\n') {
+                        if (!Contents.substring(i + 1, j).trim().equals(""))
+                            break;
+                    }
+                }
+                subContent = Contents.substring(i + 1, j);
+            } else {
+                subContent = "";
+
+            }
+
+            Log.d("mContent:", "用户输入的内容是" + mContent);
+            Note note = new Note();
+            note.setTitle(title);
+            note.setSubContent(subContent);
+            note.setContent(mContent);
+            note.setCreateTime(CommonUtil.date2string(new Date()));
+            note.setGroupName(groupName);
+
+            NoteDbHelpBusiness dbBus = NoteDbHelpBusiness.getInstance(this);
+
+            //当用户确定完成编辑之后， 意味着将旧的便签删除
+            if (oldNote != null) {
+                dbBus.deleteNote(oldNote);
+            }
+
+            dbBus.addNote(note);
         }
-
-        Log.d("mContent:", "用户输入的内容是" + mContent);
-        Note note = new Note();
-        note.setTitle(title);
-        note.setSubContent(subContent);
-        note.setContent(mContent);
-        note.setCreateTime(CommonUtil.date2string(new Date()));
-        note.setGroupName(groupName);
-
-        NoteDbHelpBusiness dbBus = NoteDbHelpBusiness.getInstance(this);
-
-        //当用户确定完成编辑之后， 意味着将旧的便签删除
-        if(oldNote != null){
-            dbBus.deleteNote(oldNote);
-        }
-
-        dbBus.addNote(note);
-
     }
 
     //关闭软键盘
     private void closeSoftKeyInput() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        //boolean isOpen=imm.isActive();//isOpen若返回true，则表示输入法打开
-        if (imm.isActive()) {
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
+        try {
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            //boolean isOpen=imm.isActive();//isOpen若返回true，则表示输入法打开
+            if (imm.isActive()) {
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -277,6 +296,14 @@ public class NoteNewActivity extends AppCompatActivity {
                 .thumbnailScale(0.85f)
                 .imageEngine(glideImageEngine)
                 .forResult(REQUEST_CODE_CHOOSE);
+//        Intent intentFromGallery = new Intent();
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {//4.4及以上
+//            intentFromGallery.setAction(Intent.ACTION_PICK);
+//        } else {//4.4以下
+//            intentFromGallery.setAction(Intent.ACTION_GET_CONTENT);
+//        }
+//        intentFromGallery.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+//        startActivityForResult(intentFromGallery, 2);
     }
 
     @Override
@@ -289,21 +316,27 @@ public class NoteNewActivity extends AppCompatActivity {
                 }else if(requestCode == REQUEST_CODE_CHOOSE){
                     mSelected = Matisse.obtainResult(data);
                     Uri nSelected = mSelected.get(0);
-
+//                    Uri nSelected =data.getData();
                     //用Uri的string来构造spanStr，不知道能不能获得图片
                     //  ## +  string +  ##  来标识图片  <img src=''>
 
                     //SpannableString spanStr = new SpannableString(nSelected.toString());
                     SpannableString spanStr = new SpannableString("<img src='" + nSelected.toString() + "'/>");
                     Log.d("图片Uri",nSelected.toString());
-                    String path = UriToPathUtil.getRealFilePath(this,nSelected);
-                    Log.d("图片Path",path);
+//                    String path = UriToPathUtil.getRealFilePath(this,nSelected);
+//                    Log.d("图片Path",path);
 
                     try{
-
+                        WindowManager windowManager = (WindowManager) (NoteNewActivity.this).getSystemService(Context.WINDOW_SERVICE);
+                        Display defaultDisplay = windowManager.getDefaultDisplay();
+                        Point point = new Point();
+                        defaultDisplay.getSize(point);
+                        int x = point.x;
+                        int y = point.y;
                         //根据Uri 获得 drawable资源
+                        //x/t=y/z
                         Drawable drawable = Drawable.createFromStream(this.getContentResolver().openInputStream(nSelected),null);
-                        drawable.setBounds(0,0,2 * drawable.getIntrinsicWidth(),2 * drawable.getIntrinsicHeight());
+                        drawable.setBounds(x/10,0,x*9/10,drawable.getIntrinsicHeight()*9*x/(drawable.getIntrinsicWidth()*10));
                         //BitmapDrawable bd = (BitmapDrawable) drawable;
                         //Bitmap bp = bd.getBitmap();
                         //bp.setDensity(160);
@@ -312,6 +345,12 @@ public class NoteNewActivity extends AppCompatActivity {
                         Log.d("spanString：",spanStr.toString());
                         int cursor = editText.getSelectionStart();
                         editText.getText().insert(cursor, spanStr);
+                        int cursor1=editText.getSelectionEnd();
+                        editText.setSelection(cursor1);//将光标移至文字末尾
+                        editText.getText().insert(cursor1,"\n");
+                        int cursor2=editText.getSelectionEnd();
+                        editText.setSelection(cursor2);//将光标移至文字末尾
+                        editText.requestFocus();//获取焦点
                     }catch (Exception FileNotFoundException){
                         Log.d("异常","无法根据Uri找到图片资源");
                     }
@@ -320,14 +359,23 @@ public class NoteNewActivity extends AppCompatActivity {
             }
         }
     }
-
+    @SuppressLint("SdCardPath")
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void startRecord(){
+
+
         if(mediaRecorder == null){
-            File dir = new File(Environment.getExternalStorageDirectory(),"sounds");
+            boolean hasSDCard = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+            String rootDir;
+            if (hasSDCard) {
+                rootDir= Environment.getExternalStorageDirectory().toString();
+            } else
+                rootDir= "/data/data";
+            File dir = new File(rootDir,"sounds");
             if (!dir.exists()){
-                dir.mkdir();
+                dir.mkdirs();
             }
-            File soundFile = new File(dir, System.currentTimeMillis() + ".amr");
+            File soundFile = new File(dir, DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA))  + ".m4a");
             if(!soundFile.exists()){
                 try {
                     soundFile.createNewFile();
@@ -337,11 +385,10 @@ public class NoteNewActivity extends AppCompatActivity {
             }
             mediaRecorder = new MediaRecorder();
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AMR_WB);
-            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_WB);
-            mediaRecorder.setOutputFile(soundFile.getAbsolutePath());
-
-            editText.append("<voice src='" + soundFile.getAbsolutePath() + "'/>");
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+            mediaRecorder.setOutputFile(soundFile.getPath());
+            editText.append("<voice src='" + soundFile.getPath() + "'/>");
 
             try {
                 mediaRecorder.prepare();
@@ -355,9 +402,24 @@ public class NoteNewActivity extends AppCompatActivity {
 
     private void stopRecord(){
         if (mediaRecorder != null){
-            mediaRecorder.stop();
-            mediaRecorder.release();
-            mediaRecorder = null;
+            mediaRecorder.setOnErrorListener(null);
+            mediaRecorder.setOnInfoListener(null);
+            mediaRecorder.setPreviewDisplay(null);
+            try {
+                mediaRecorder.stop();
+                mediaRecorder.release();
+                mediaRecorder = null;
+            } catch (IllegalStateException e) {
+                mediaRecorder = null;
+                e.printStackTrace();
+            } catch (RuntimeException e) {
+                mediaRecorder = null;
+                e.printStackTrace();
+            } catch (Exception e) {
+                mediaRecorder = null;
+                e.printStackTrace();
+            }
+
         }
     }
 

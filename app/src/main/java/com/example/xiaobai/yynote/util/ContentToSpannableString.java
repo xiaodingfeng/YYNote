@@ -7,6 +7,9 @@ voice setSpan变为两个标志，之后textView .set 就会将其还原
  */
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -16,8 +19,11 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,15 +33,15 @@ import java.util.regex.Pattern;
 public class ContentToSpannableString {
 
 
-    public static SpannableString Content2SpanStr(Context context, String noteContent){
+    public static SpannableString Content2SpanStr(Context context, String noteContent) {
         //这里的fakeNoteContent 是虚假content，是展示给用户的，因为真正的content中包含着的声音src变为可点击spannable之后会很丑
         String fakeNoteContent = noteContent;
         ArrayList<String> voiceSrc = new ArrayList<>();
         Pattern voice = Pattern.compile("<voice src='(.*?)'/>");
-        Matcher mVoice = voice.matcher(noteContent);
+        Matcher mVoice = voice.matcher(fakeNoteContent);
         while(mVoice.find()){
             String str1 = mVoice.group(0);
-            fakeNoteContent = noteContent.replace(str1,"");
+            fakeNoteContent = fakeNoteContent.replace(str1,"");
             String str2 = mVoice.group(1);
             voiceSrc.add(str2);
         }
@@ -56,9 +62,17 @@ public class ContentToSpannableString {
             int start = mImg.start();   int end = mImg.end();
             Uri imgUri = Uri.parse(mImg.group(1));
             Drawable drawable = null;
+//            FileInputStream fis = new FileInputStream(String.valueOf(imgUri));
+//            Bitmap bitmap  = BitmapFactory.decodeStream(fis);
             try {
+                WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+                Display defaultDisplay = windowManager.getDefaultDisplay();
+                Point point = new Point();
+                defaultDisplay.getSize(point);
+                int x = point.x;
+                int y = point.y;
                 drawable = Drawable.createFromStream(context.getContentResolver().openInputStream(imgUri),null);
-                drawable.setBounds(0,0,2 * drawable.getIntrinsicWidth(),2 * drawable.getIntrinsicHeight());
+                drawable.setBounds(x/10,0,(x*9)/10,drawable.getIntrinsicHeight()*9*x/(drawable.getIntrinsicWidth()*10));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -117,6 +131,7 @@ public class ContentToSpannableString {
 
         return spanStr;
     }
+
 
 
 }

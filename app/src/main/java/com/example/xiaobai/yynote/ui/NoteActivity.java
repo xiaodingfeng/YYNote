@@ -2,49 +2,31 @@ package com.example.xiaobai.yynote.ui;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
-import android.net.Uri;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.Spannable;
+
+import androidx.annotation.Nullable;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.xiaobai.yynote.R;
 import com.example.xiaobai.yynote.bean.Note;
 import com.example.xiaobai.yynote.db.NoteDbHelpBusiness;
 import com.example.xiaobai.yynote.util.ContentToSpannableString;
-import com.example.xiaobai.yynote.util.UriImageGetter;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class NoteActivity extends AppCompatActivity {
@@ -54,8 +36,7 @@ public class NoteActivity extends AppCompatActivity {
     private AlarmManager alarmManager;
     private PendingIntent pi;
     private long date1;
-
-
+    private  int notegroupid=0;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +59,8 @@ public class NoteActivity extends AppCompatActivity {
         textView = this.findViewById(R.id.TextView_showNote);
         float WordSize = getWordSize(wordSizePrefs);
         textView.setTextSize(WordSize);
-
+//        Typeface typeFace =Typeface.createFromAsset(getAssets(), "fonts/fzfsk.ttf");
+//        textView.setTypeface(typeFace);
         String content = note.getContent();
 
         /*
@@ -132,7 +114,10 @@ public class NoteActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("data");
         note = (Note)bundle.getSerializable("Note");
-
+        if(note.getGroupName().equals("生活"))
+            notegroupid=1;
+        else if(note.getGroupName().equals("工作"))
+            notegroupid=2;
         //字体大小默认是20dp  正常    其中 15 dp 对应小     25dp  对应 大    30dp对应超大
         SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
         wordSizePrefs = prefs.getString("WordSize","正常");
@@ -192,14 +177,39 @@ public class NoteActivity extends AppCompatActivity {
                         }).create();
                 alertDialog.show();
             }
-        }else if(id == R.id.show_menu_wordSize){
+        }
+        else if(id==R.id.MoveGroup){
+            final NoteDbHelpBusiness dbBus = NoteDbHelpBusiness.getInstance(this);
+            final String[] items3 = new String[]{"未分组", "生活", "工作"};//创建item
+            AlertDialog.Builder builder = new AlertDialog.Builder(NoteActivity.this);
+            AlertDialog alertDialog = builder.setTitle("移动地址：")
+                    .setSingleChoiceItems(items3,notegroupid, new DialogInterface.OnClickListener() {//添加列表
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            notegroupid=i;
+                            dbBus.UpdateGroupName(note,items3[i]);
+                        }
+                    }).create();
+            alertDialog.show();
+        }
+        else if(id == R.id.show_menu_wordSize){
             final String[] wordSize = new String[]{"小","正常","大","超大"};
+            final int[] index = {0};
+            SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
+
+            if(prefs.getString("WordSize", "正常").equals("正常"))
+                index[0] =1;
+            else  if(prefs.getString("WordSize", "正常").equals("大"))
+                index[0] =2;
+            else  if(prefs.getString("WordSize", "正常").equals("超大"))
+                index[0] =3;
             AlertDialog.Builder builder = new AlertDialog.Builder(NoteActivity.this);
             AlertDialog alertDialog = builder.setTitle("选择字体大小")
-                                        .setSingleChoiceItems(wordSize, 0, new DialogInterface.OnClickListener() {
+                                        .setSingleChoiceItems(wordSize, index[0], new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialogInterface, int i) {
                                                 wordSizePrefs = wordSize[i];
+                                                index[0] =i;
                                                 float WordSize = getWordSize(wordSizePrefs);
                                                 textView.setTextSize(WordSize);
                                                 SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
@@ -232,11 +242,6 @@ public class NoteActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    //由于调整了字体大小，所以重新载入Note
-    private void reloadNote(){
-
     }
 
     private float getWordSize(String str){

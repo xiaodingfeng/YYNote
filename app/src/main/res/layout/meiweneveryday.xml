@@ -2,7 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:background="@drawable/text_view_border"
+    android:id="@+id/meiwen"
+    >
 
     <TextView
         android:id="@+id/textView2"
@@ -10,15 +15,41 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textSize="18sp"
+        android:layout_marginTop="30dp"
         android:text="标题"
+        android:textColor="@color/black"
+        android:background="@drawable/text_view_border"
         android:gravity="center_horizontal" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/textView3"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/textView2"
-        android:text="TextView" />
-
-
+        android:background="@drawable/text_view_border"
+        android:gravity="center_horizontal"
+        android:text="作者"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="10sp"
+        tools:ignore="SmallSp" />
+    <ScrollView
+        android:id="@+id/scrollView"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_below="@+id/textView3">
+    <TextView
+        android:id="@+id/textView4"
+        android:textColor="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="5dp"
+        android:background="@drawable/text_view_border"
+        android:text="正文"
+        tools:ignore="RtlSymmetry" />
+    </ScrollView>
 </RelativeLayout>

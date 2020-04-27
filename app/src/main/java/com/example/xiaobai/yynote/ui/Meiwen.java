@@ -1,28 +1,49 @@
 package com.example.xiaobai.yynote.ui;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.xiaobai.yynote.R;
 import com.example.xiaobai.yynote.bean.Article;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Meiwen extends AppCompatActivity {
     private Handler handler;
-    private List<Article> newsList;
+    private static Article article=new Article();
     private TextView textView;
     private TextView textView1;
-    @SuppressLint("HandlerLeak")
+    private TextView textView2;
+
+    private  float pressX,pressY,moveX,moveY;
+    private String urlBefor;
+    private String urlNext;
+    private String urlMeiri="https://meiriyiwen.com/random";
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @SuppressLint({"HandlerLeak", "ClickableViewAccessibility"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,21 +52,218 @@ public class Meiwen extends AppCompatActivity {
             getSupportActionBar().hide();
         }
         setContentView(R.layout.meiweneveryday);
+        Window window = this.getWindow();
+        //清除透明状态栏
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        //设置状态栏颜色必须添加
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);//设置透明
+
         textView=(TextView)findViewById(R.id.textView2);
         textView1=(TextView)findViewById(R.id.textView4);
-        getNews();
+        textView2=(TextView)findViewById(R.id.textView3);
+        RelativeLayout relativeLayout=(RelativeLayout)findViewById(R.id.meiwen);
+        textView1.setOnTouchListener(new View.OnTouchListener() {
+
+            @SuppressLint("WrongConstant")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    //按下
+                    case MotionEvent.ACTION_DOWN:
+                        pressX = event.getX();
+                        pressY = event.getY();
+                        break;
+                    //移动
+                    case MotionEvent.ACTION_MOVE:
+                        moveX = event.getX();
+                        moveY = event.getY();
+                        break;
+                    //松开
+                    case MotionEvent.ACTION_UP:
+                        if (moveX-pressX > 0 && Math.abs(moveY - pressY) < 250) {
+//                            Log.i("message", "向右");
+//                            if(urlBefor!=null) {
+//                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
+//                                textView1.setText("");
+//                                new Thread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        try{
+//                                            if(getArticle(urlBefor)){
+//                                                Message msg = new Message();
+//                                                msg.what = 1;
+//                                                handler.sendMessage(msg);
+//                                            }
+//                                            else{
+//                                                Message msg = new Message();
+//                                                msg.what = 0;
+//                                                handler.sendMessage(msg);
+//                                            }
+//                                        }catch (Exception e){
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }).start();
+//
+//                            }
+//                            else
+//                                Toast.makeText(Meiwen.this, "无上一页！", 0).show();
+                            getNews(urlMeiri);
+                        } else if (moveX - pressX < 0 && Math.abs(moveY - pressY) < 250) {
+//                            if(urlNext!=null) {
+//                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
+//                                textView1.setText("");
+//                                new Thread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        try{
+//                                            if(getArticle(urlNext)){
+//                                                Message msg = new Message();
+//                                                msg.what = 1;
+//                                                handler.sendMessage(msg);
+//                                            }
+//                                            else{
+//                                                Message msg = new Message();
+//                                                msg.what = 0;
+//                                                handler.sendMessage(msg);
+//                                            }
+//                                        }catch (Exception e){
+////                                            textView1.setText(e.toString());
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }).start();
+//
+//                            }
+//                            else
+//                                Toast.makeText(Meiwen.this, "无下一页！", 0).show();
+                            getNews(urlMeiri);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+        relativeLayout.setOnTouchListener(new View.OnTouchListener() {
+
+            @SuppressLint("WrongConstant")
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    //按下
+                    case MotionEvent.ACTION_DOWN:
+                        pressX = event.getX();
+                        pressY = event.getY();
+                        break;
+                    //移动
+                    case MotionEvent.ACTION_MOVE:
+                        moveX = event.getX();
+                        moveY = event.getY();
+                        break;
+                    //松开
+                    case MotionEvent.ACTION_UP:
+                        if (moveX-pressX > 0 && Math.abs(moveY - pressY) < 250) {
+//                            Log.i("message", "向右");
+//                            if(urlBefor!=null) {
+//                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
+//                                textView1.setText("");
+//                                new Thread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        try{
+//                                            if(getArticle(urlBefor)){
+//                                                Message msg = new Message();
+//                                                msg.what = 1;
+//                                                handler.sendMessage(msg);
+//                                            }
+//                                            else{
+//                                                Message msg = new Message();
+//                                                msg.what = 0;
+//                                                handler.sendMessage(msg);
+//                                            }
+//                                        }catch (Exception e){
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }).start();
+//
+//                            }
+//                            else
+//                                Toast.makeText(Meiwen.this, "无上一页！", 0).show();
+                            getNews(urlMeiri);
+                        } else if (moveX - pressX < 0 && Math.abs(moveY - pressY) < 250) {
+//                            if(urlNext!=null) {
+//                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
+//                                textView1.setText("");
+//                                new Thread(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        try{
+//                                            if(getArticle(urlNext)){
+//                                                Message msg = new Message();
+//                                                msg.what = 1;
+//                                                handler.sendMessage(msg);
+//                                            }
+//                                            else{
+//                                                Message msg = new Message();
+//                                                msg.what = 0;
+//                                                handler.sendMessage(msg);
+//                                            }
+//                                        }catch (Exception e){
+////                                            textView1.setText(e.toString());
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }).start();
+//
+//                            }
+//                            else
+//                                Toast.makeText(Meiwen.this, "无下一页！", 0).show();
+                            getNews(urlMeiri);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+        });
+        Typeface typeFace =Typeface.createFromAsset(getAssets(), "fonts/fzfsk.ttf");
+        textView.setTypeface(typeFace);
+        textView1.setTypeface(typeFace);
+        textView2.setTypeface(typeFace);
+        textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
+        textView1.setText("");
+        textView2.setText("");
+//        getNews("http://www.xiaole8.com/");
+        getNews(urlMeiri);
         handler = new Handler() {
-            @SuppressLint("SetTextI18n")
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @SuppressLint({"SetTextI18n", "WrongConstant"})
             @Override
             public void handleMessage(Message msg) {
                 if (msg.what == 1) {
-                    Article news = newsList.get(0);
-                    textView.setText(news.getArticleTitle()+"\n"+news.getArticleWho());
-                    textView1.setText(news.getContents());
+//                    textView1.setFocusable(0);
+                    final ScrollView vScrollView=(ScrollView)findViewById(R.id.scrollView) ;
+                    vScrollView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            vScrollView.fullScroll(View.FOCUS_UP);
+                        }
+                    });
+                    textView.setText(article.getArticleTitle());
+                    textView2.setText(article.getArticleWho());
+                    textView1.setText(article.getContents()+"\n\n全文完，字数："+article.getContents().length()+"\n\n");
                 }
-                else{
-                    textView.setText("加载中。。。");
-                    textView1.setText("加载中。。。");
+                else if(msg.what==0){
+                    textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"访问数据超时！");
+                    textView2.setText("");
+                    textView1.setText("");
                 }
             }
         };
@@ -76,37 +294,132 @@ public class Meiwen extends AppCompatActivity {
         }
         return doc;
     }
-    private void getNews(){
+    private void getNews(final String url){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try{
-                   int i= (int) (Math.random() * 36);
-                    textView.setText("加载中。。。");
-                    textView1.setText("加载中。。。");
-//                    Document doc = Jsoup.connect("http://www.xiaole8.com/renshengzheli/page_"+Integer.toString(i)+".html").userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36").timeout(3000).post();
-//                   Document doc = Jsoup.connect("http://www.xiaole8.com/renshengzheli/page_"+Integer.toString(i)+".html").get();
-                    Document doc =getJsoupDocGet("http://www.xiaole8.com/renshengzheli/page_"+Integer.toString(i)+".html");
-                    textView1.setText(doc.text());
-                   Elements titleLinks = doc.select("ul.l2");    //解析来获取每条新闻的标题与链接地址
-                    Elements titlelins = titleLinks.get(0).select("li");
-                    int j= (int) (Math.random() * titlelins.size());
-                    String uri = titlelins.get(j).select("a").attr("href");
-                    String title = titlelins.get(j).select("a").text();
-                    Document doc1 = Jsoup.connect(uri).get();
-                    String mainarctile=doc1.select("div.wzcon").select("p").text();
-                    String laiyuan=doc1.select("div.info").text();
-                    mainarctile=mainarctile.replaceAll("<br>","\n");
-                    Article article = new Article(title, uri,laiyuan,mainarctile);
-                    newsList.add(article);
-                    Message msg = new Message();
-                    msg.what = 1;
-                    handler.sendMessage(msg);
-
+                    //笑了吧文章网
+//                    Document doc3 =getJsoupDocGet(url);
+//                    Element menu=doc3.selectFirst("div.menu");
+//                    Element ul=menu.selectFirst("ul");
+//                    Elements li=ul.select("li");
+//                    int m= (int)(1+Math.random()*li.size());
+////                   int i= (int)(1+Math.random()*(36-1+1));
+//                    String uri1=li.get(m).select("a").attr("href");
+//                   Document doc2 =getJsoupDocGet(uri1);
+//                    if (doc2!=null){
+//                    Elements strong=doc2.select("span.pageinfo");
+//                    Element strong1=strong.select("strong").first();
+//                    String str=strong1.text();
+//                    int max= Integer.parseInt(str);
+//                    int i= (int)(1+Math.random()*(max-1+1));
+//                    Document doc =getJsoupDocGet(uri1+"page_"+Integer.toString(i)+".html");
+//                   if (doc!=null) {
+//
+//                       Element titleLinks = doc.selectFirst("ul.l2");
+//                       Elements titlelins = titleLinks.select("li");
+//                       int j = (int) (Math.random() * titlelins.size());
+//                       String uri = titlelins.get(j).select("a").attr("href");
+//                       if(getArticle(uri)) {
+//                           Message msg = new Message();
+//                           msg.what = 1;
+//                           handler.sendMessage(msg);
+//                       }
+//                       else {
+//                           Message msg = new Message();
+//                           msg.what = 0;
+//                           handler.sendMessage(msg);
+//                       }
+//                   }
+//                   else
+//                   {
+//                       Message msg = new Message();
+//                       msg.what = 0;
+//                       handler.sendMessage(msg);
+//                   }
+//                    }
+//                    else
+//                    {
+//                        Message msg = new Message();
+//                        msg.what = 0;
+//                        handler.sendMessage(msg);
+//                    }
+                    //每日一文文章网
+                    Document doc3 =getJsoupDocGet(url);
+                    if(doc3!=null) {
+                        Element arcticle = doc3.selectFirst("div#article_show");
+                        String Title = arcticle.selectFirst("h1").text();
+                        String Who = arcticle.selectFirst("p.article_author").text();
+                        String Contents = arcticle.selectFirst("div.article_text").html();
+                        Pattern pattern = Pattern.compile("</p>");
+                        Matcher matcher = pattern.matcher(Contents);
+                        String newString = matcher.replaceAll("\n");
+                        Pattern pattern1 = Pattern.compile("<p>");
+                        Matcher matcher1 = pattern1.matcher(newString);
+                        newString = matcher1.replaceAll("    ");
+                        article.setArticleTitle(Title);
+//                    article.setArticleUrl(uri);
+                        article.setArticleWho(Who);
+                        article.setArticleContent(newString);
+                        Message msg = new Message();
+                        msg.what = 1;
+                        handler.sendMessage(msg);
+                    }
+                    else{
+                        Message msg = new Message();
+                        msg.what = 0;
+                        handler.sendMessage(msg);
+                    }
                 }catch (Exception e){
+                    Message msg = new Message();
+                    msg.what = 0;
+                    handler.sendMessage(msg);
                    e.printStackTrace();
                 }
             }
         }).start();
+    }
+    @SuppressLint("WrongConstant")
+    private boolean getArticle(String uri){
+        try {
+            Document doc1 = getJsoupDocGet(uri);
+            Element title = doc1.selectFirst("div.channel");
+            String title1 = title.selectFirst("div.title").text();
+            Element ntitle = doc1.selectFirst("div.ntitle");
+            Element ntitle1 = ntitle.selectFirst("ul");
+            Elements ntitle2 = ntitle1.select("li");
+            try {
+                urlBefor = ntitle2.get(0).select("a").attr("href");
+            }
+            catch (Exception e){
+                urlBefor=null;
+            }
+            try {
+                urlNext = ntitle2.get(1).select("a").attr("href");
+            }
+            catch (Exception e){
+                urlNext=null;
+            }
+            String mainarctile = doc1.select("div.wzcon").select("p").html();
+//            String laiyuan = doc1.select("div.info").text();
+            Pattern pattern = Pattern.compile("<br>|<a(.+?)</a>");
+            Pattern pattern1 = Pattern.compile("<b>|</b>|&nbsp;|<font(.+?)>|</font>|笑话大全|<strong>|</strong>");
+//正则表达式的匹配一定要是这样，单个替换\r|\n的时候会错误
+            Matcher matcher = pattern.matcher(mainarctile);
+            String newString = matcher.replaceAll("\n");
+            Matcher matcher1 = pattern1.matcher(newString);
+            newString = matcher1.replaceAll("");
+//                    mainarctile=mainarctile.replaceAll("/<br\\>g","\n\n");
+            article.setArticleTitle(title1);
+//            article.setArticleUrl(uri);
+//            article.setArticleWho(laiyuan);
+            article.setArticleContent(newString);
+            return true;
+        }
+        catch (Exception e){
+            Toast.makeText(Meiwen.this, e.toString(), 0).show();
+            return false;
+        }
     }
 }

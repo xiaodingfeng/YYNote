@@ -17,6 +17,11 @@
         android:title="@string/menu_share"
         app:showAsAction="never" />
     <item
+        android:id="@+id/MoveGroup"
+        android:orderInCategory="100"
+        android:title="移动到"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/show_menu_remind"
         android:orderInCategory="100"
         android:title="@string/menu_remind"
