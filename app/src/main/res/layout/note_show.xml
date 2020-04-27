@@ -22,7 +22,13 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/note_show_content"/>
+    <include layout="@layout/note_show_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/toolbar_note_new"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_note_edit"

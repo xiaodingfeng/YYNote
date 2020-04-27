@@ -8,7 +8,14 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    android.applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                // 此处指定生成的apk文件名
+                outputFileName = "YYNote_1.0.apk"
+            }
     }
     buildTypes {
         release {

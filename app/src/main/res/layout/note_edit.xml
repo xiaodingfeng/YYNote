@@ -20,7 +20,14 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/note_new_content"></include>
+    <include
+        layout="@layout/note_new_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar_note_new"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="?attr/actionBarSize" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_note_new_complete"
