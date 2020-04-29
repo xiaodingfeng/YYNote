@@ -37,6 +37,7 @@ public class NoteActivity extends AppCompatActivity {
     private PendingIntent pi;
     private long date1;
     private  int notegroupid=0;
+    FloatingActionButton btn_note_complete;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +79,7 @@ public class NoteActivity extends AppCompatActivity {
 
 
         //不能识别换行？？/n   replace 因为  Html.fromHtml 无法识别\n
-        SpannableString spannableString = ContentToSpannableString.Content2SpanStr(NoteActivity.this, content);
+        SpannableString spannableString = ContentToSpannableString.Content2SpanStr(NoteActivity.this, content,true);
 
         //不加下面这句点击没反应  可点击 字 的实现要求 注意：要位于textView.setText()的前面
         textView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -90,7 +91,9 @@ public class NoteActivity extends AppCompatActivity {
         //String str = textView.getText().toString();
         //Log.d("textView", "textView" + str);
 
-        FloatingActionButton btn_note_complete = findViewById(R.id.button_note_edit);
+        btn_note_complete = findViewById(R.id.button_note_edit);
+        if(notegroupid==3)
+            btn_note_complete.setVisibility(View.GONE);
         btn_note_complete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -118,6 +121,8 @@ public class NoteActivity extends AppCompatActivity {
             notegroupid=1;
         else if(note.getGroupName().equals("工作"))
             notegroupid=2;
+        else if(note.getGroupName().equals("回收站"))
+            notegroupid=3;
         //字体大小默认是20dp  正常    其中 15 dp 对应小     25dp  对应 大    30dp对应超大
         SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
         wordSizePrefs = prefs.getString("WordSize","正常");
@@ -180,13 +185,17 @@ public class NoteActivity extends AppCompatActivity {
         }
         else if(id==R.id.MoveGroup){
             final NoteDbHelpBusiness dbBus = NoteDbHelpBusiness.getInstance(this);
-            final String[] items3 = new String[]{"未分组", "生活", "工作"};//创建item
+            final String[] items3 = new String[]{"未分组", "生活", "工作","回收站"};//创建item
             AlertDialog.Builder builder = new AlertDialog.Builder(NoteActivity.this);
             AlertDialog alertDialog = builder.setTitle("移动地址：")
                     .setSingleChoiceItems(items3,notegroupid, new DialogInterface.OnClickListener() {//添加列表
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             notegroupid=i;
+                            if(notegroupid==3)
+                                btn_note_complete.setVisibility(View.GONE);
+                            else
+                                btn_note_complete.setVisibility(View.VISIBLE);
                             dbBus.UpdateGroupName(note,items3[i]);
                         }
                     }).create();

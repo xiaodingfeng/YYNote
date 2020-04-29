@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 public class ContentToSpannableString {
 
 
-    public static SpannableString Content2SpanStr(Context context, String noteContent) {
+    public static SpannableString Content2SpanStr(Context context, String noteContent,boolean check) {
         //这里的fakeNoteContent 是虚假content，是展示给用户的，因为真正的content中包含着的声音src变为可点击spannable之后会很丑
         String fakeNoteContent = noteContent;
         ArrayList<String> voiceSrc = new ArrayList<>();
@@ -41,7 +41,8 @@ public class ContentToSpannableString {
         Matcher mVoice = voice.matcher(fakeNoteContent);
         while(mVoice.find()){
             String str1 = mVoice.group(0);
-            fakeNoteContent = fakeNoteContent.replace(str1,"");
+            if(check)
+                fakeNoteContent = fakeNoteContent.replace(str1,"");
             String str2 = mVoice.group(1);
             voiceSrc.add(str2);
         }

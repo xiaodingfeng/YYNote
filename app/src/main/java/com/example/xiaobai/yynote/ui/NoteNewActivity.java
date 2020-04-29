@@ -103,7 +103,7 @@ public class NoteNewActivity extends AppCompatActivity {
         }else{
             Bundle bundle = getIntent().getBundleExtra("data");
             oldNote = (Note)bundle.getSerializable("OldNote");
-            SpannableString spannableString = ContentToSpannableString.Content2SpanStr(NoteNewActivity.this, oldNote.getContent());
+            SpannableString spannableString = ContentToSpannableString.Content2SpanStr(NoteNewActivity.this, oldNote.getContent(),false);
             editText.append(spannableString);
             /*
             此时如果用户只是进来看一眼，就不应该删除。

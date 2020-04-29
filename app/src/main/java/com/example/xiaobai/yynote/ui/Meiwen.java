@@ -1,6 +1,8 @@
 package com.example.xiaobai.yynote.ui;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -9,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.MotionEvent;
@@ -37,7 +40,7 @@ public class Meiwen extends AppCompatActivity {
     private TextView textView;
     private TextView textView1;
     private TextView textView2;
-
+    String wordSizePrefs;
     private  float pressX,pressY,moveX,moveY;
     private String urlBefor;
     private String urlNext;
@@ -65,90 +68,123 @@ public class Meiwen extends AppCompatActivity {
         textView1=(TextView)findViewById(R.id.textView4);
         textView2=(TextView)findViewById(R.id.textView3);
         RelativeLayout relativeLayout=(RelativeLayout)findViewById(R.id.meiwen);
-        textView1.setOnTouchListener(new View.OnTouchListener() {
 
-            @SuppressLint("WrongConstant")
+        textView1.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    //按下
-                    case MotionEvent.ACTION_DOWN:
-                        pressX = event.getX();
-                        pressY = event.getY();
-                        break;
-                    //移动
-                    case MotionEvent.ACTION_MOVE:
-                        moveX = event.getX();
-                        moveY = event.getY();
-                        break;
-                    //松开
-                    case MotionEvent.ACTION_UP:
-                        if (moveX-pressX > 0 && Math.abs(moveY - pressY) < 250) {
-//                            Log.i("message", "向右");
-//                            if(urlBefor!=null) {
-//                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
-//                                textView1.setText("");
-//                                new Thread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        try{
-//                                            if(getArticle(urlBefor)){
-//                                                Message msg = new Message();
-//                                                msg.what = 1;
-//                                                handler.sendMessage(msg);
-//                                            }
-//                                            else{
-//                                                Message msg = new Message();
-//                                                msg.what = 0;
-//                                                handler.sendMessage(msg);
-//                                            }
-//                                        }catch (Exception e){
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                }).start();
-//
-//                            }
-//                            else
-//                                Toast.makeText(Meiwen.this, "无上一页！", 0).show();
-                            getNews(urlMeiri);
-                        } else if (moveX - pressX < 0 && Math.abs(moveY - pressY) < 250) {
-//                            if(urlNext!=null) {
-//                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
-//                                textView1.setText("");
-//                                new Thread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        try{
-//                                            if(getArticle(urlNext)){
-//                                                Message msg = new Message();
-//                                                msg.what = 1;
-//                                                handler.sendMessage(msg);
-//                                            }
-//                                            else{
-//                                                Message msg = new Message();
-//                                                msg.what = 0;
-//                                                handler.sendMessage(msg);
-//                                            }
-//                                        }catch (Exception e){
-////                                            textView1.setText(e.toString());
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                }).start();
-//
-//                            }
-//                            else
-//                                Toast.makeText(Meiwen.this, "无下一页！", 0).show();
-                            getNews(urlMeiri);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                return true;
+            public boolean onLongClick(View view) {
+                final String[] wordSize = new String[]{"小","正常","大","超大"};
+                final int[] index = {0};
+                SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
+
+                if(prefs.getString("WordSizeToMeiwen", "正常").equals("正常"))
+                    index[0] =1;
+                else  if(prefs.getString("WordSizeToMeiwen", "正常").equals("大"))
+                    index[0] =2;
+                else  if(prefs.getString("WordSizeToMeiwen", "正常").equals("超大"))
+                    index[0] =3;
+                AlertDialog.Builder builder = new AlertDialog.Builder(Meiwen.this);
+                AlertDialog alertDialog = builder.setTitle("选择字体大小")
+                        .setSingleChoiceItems(wordSize, index[0], new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                wordSizePrefs = wordSize[i];
+                                index[0] =i;
+                                float WordSize = getWordSize(wordSizePrefs);
+                                textView1.setTextSize(WordSize);
+                                SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
+                                SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString("WordSizeToMeiwen",wordSizePrefs);
+                                editor.apply();         //editor.commit();
+                            }
+                        }).create();
+                alertDialog.show();
+                return false;
             }
         });
+//        textView1.setOnTouchListener(new View.OnTouchListener() {
+//
+//            @SuppressLint("WrongConstant")
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    //按下
+//                    case MotionEvent.ACTION_DOWN:
+//                        pressX = event.getX();
+//                        pressY = event.getY();
+//                        break;
+//                    //移动
+//                    case MotionEvent.ACTION_MOVE:
+//                        moveX = event.getX();
+//                        moveY = event.getY();
+//                        break;
+//                    //松开
+//                    case MotionEvent.ACTION_UP:
+//                        if (moveX-pressX > 0 && Math.abs(moveY - pressY) < 250) {
+////                            Log.i("message", "向右");
+////                            if(urlBefor!=null) {
+////                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
+////                                textView1.setText("");
+////                                new Thread(new Runnable() {
+////                                    @Override
+////                                    public void run() {
+////                                        try{
+////                                            if(getArticle(urlBefor)){
+////                                                Message msg = new Message();
+////                                                msg.what = 1;
+////                                                handler.sendMessage(msg);
+////                                            }
+////                                            else{
+////                                                Message msg = new Message();
+////                                                msg.what = 0;
+////                                                handler.sendMessage(msg);
+////                                            }
+////                                        }catch (Exception e){
+////                                            e.printStackTrace();
+////                                        }
+////                                    }
+////                                }).start();
+////
+////                            }
+////                            else
+////                                Toast.makeText(Meiwen.this, "无上一页！", 0).show();
+//                            getNews(urlMeiri);
+//                        } else if (moveX - pressX < 0 && Math.abs(moveY - pressY) < 250) {
+////                            if(urlNext!=null) {
+////                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
+////                                textView1.setText("");
+////                                new Thread(new Runnable() {
+////                                    @Override
+////                                    public void run() {
+////                                        try{
+////                                            if(getArticle(urlNext)){
+////                                                Message msg = new Message();
+////                                                msg.what = 1;
+////                                                handler.sendMessage(msg);
+////                                            }
+////                                            else{
+////                                                Message msg = new Message();
+////                                                msg.what = 0;
+////                                                handler.sendMessage(msg);
+////                                            }
+////                                        }catch (Exception e){
+//////                                            textView1.setText(e.toString());
+////                                            e.printStackTrace();
+////                                        }
+////                                    }
+////                                }).start();
+////
+////                            }
+////                            else
+////                                Toast.makeText(Meiwen.this, "无下一页！", 0).show();
+//                            getNews(urlMeiri);
+//                        }
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
         relativeLayout.setOnTouchListener(new View.OnTouchListener() {
 
             @SuppressLint("WrongConstant")
@@ -237,11 +273,15 @@ public class Meiwen extends AppCompatActivity {
         textView.setTypeface(typeFace);
         textView1.setTypeface(typeFace);
         textView2.setTypeface(typeFace);
-        textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
+        textView.setText("\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
         textView1.setText("");
         textView2.setText("");
 //        getNews("http://www.xiaole8.com/");
         getNews(urlMeiri);
+        SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
+        wordSizePrefs = prefs.getString("WordSizeToMeiwen","正常");
+        float WordSize = getWordSize(wordSizePrefs);
+        textView1.setTextSize(WordSize);
         handler = new Handler() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @SuppressLint({"SetTextI18n", "WrongConstant"})
@@ -268,6 +308,21 @@ public class Meiwen extends AppCompatActivity {
             }
         };
     }
+
+    private float getWordSize(String str){
+        if (str.equals("小")){
+            return 15;
+        }else if(str.equals("正常")){
+            return 20;
+        }else if(str.equals("大")) {
+            return 25;
+        }else if(str.equals("超大")) {
+            return 30;
+        }
+        return 20;
+    }
+
+
     public static Document getJsoupDocGet(String url) {
         //三次试错
         final int MAX = 10;

@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,6 +46,8 @@ import com.simple.spiderman.SpiderMan;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static android.widget.AbsListView.OnScrollListener.SCROLL_STATE_IDLE;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener ,View.OnClickListener {
@@ -205,6 +209,15 @@ public class MainActivity extends AppCompatActivity
         //recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         recyclerView.addItemDecoration(new SpacesItemDecoration(3));   //用了card view之后不用再设置分隔线了 不知道上面那句要不要去掉
         recyclerView.setAdapter(noteAdapter);
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                if(newState==SCROLL_STATE_IDLE){
+//                    noteAdapter.notifyDataSetChanged(); // notify调用后onBindViewHolder会响应调用
+//                }
+//                super.onScrollStateChanged(recyclerView, newState);
+//            }
+//        });
         //根据用户的喜好设置 来刷新 LayoutManager，完成实时刷新
         refreshLayoutManager();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
