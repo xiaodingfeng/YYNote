@@ -12,10 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     <EditText
+
         android:id="@+id/note_new_editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="#00ffffff"
+        android:textColor="@color/black"
         android:layout_marginTop="20dp"
         android:paddingBottom="90dp"
         android:lineSpacingMultiplier="1.2"
