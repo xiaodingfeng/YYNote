@@ -7,6 +7,7 @@ voice setSpan变为两个标志，之后textView .set 就会将其还原
  */
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
@@ -22,6 +23,8 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
+
+import com.bumptech.glide.load.engine.Resource;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,23 +66,27 @@ public class ContentToSpannableString {
             int start = mImg.start();   int end = mImg.end();
             Uri imgUri = Uri.parse(mImg.group(1));
             Drawable drawable = null;
-//            FileInputStream fis = new FileInputStream(String.valueOf(imgUri));
-//            Bitmap bitmap  = BitmapFactory.decodeStream(fis);
+            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+            Display defaultDisplay = windowManager.getDefaultDisplay();
+            Point point = new Point();
+            defaultDisplay.getSize(point);
+            int x = point.x;
+            int y = point.y;
             try {
-                WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-                Display defaultDisplay = windowManager.getDefaultDisplay();
-                Point point = new Point();
-                defaultDisplay.getSize(point);
-                int x = point.x;
-                int y = point.y;
                 drawable = Drawable.createFromStream(context.getContentResolver().openInputStream(imgUri),null);
                 drawable.setBounds(x/10,0,(x*9)/10,drawable.getIntrinsicHeight()*9*x/(drawable.getIntrinsicWidth()*10));
+
             } catch (FileNotFoundException e) {
+                Resources resource=context.getResources();
+                int resid=resource.getIdentifier("erros","drawable",context.getPackageName());
+                drawable = resource.getDrawable(resid);
+                drawable.setBounds(x/10,0,(x*9)/10,drawable.getIntrinsicHeight()*9*x/(drawable.getIntrinsicWidth()*10));
                 e.printStackTrace();
             }
             ImageSpan imageSpan = new ImageSpan(drawable);
 
             spanStr.setSpan(imageSpan,start,end,Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+
         }
 
         int i = 0;

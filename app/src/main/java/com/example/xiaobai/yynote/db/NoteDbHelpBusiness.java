@@ -93,23 +93,6 @@ public class NoteDbHelpBusiness {
 
         db.delete(NotesDatabaseHelper.TABLE.NOTE,"id = ?",new String[]{id1});
     }
-    public void updateImage(String uri){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("uri",uri);
-        db = mHelper.getWritableDatabase();
-        db.execSQL("delete from touxiang");
-        db.insert("touxiang",null,contentValues);
-    }
-    public String seletimage(){
-        db = mHelper.getWritableDatabase();
-        Cursor cursor=db.query("touxiang",null,null,null,null,null,null);
-        if (cursor.getCount()>=0){
-            while(cursor.moveToNext()){
-                return cursor.getString(cursor.getColumnIndex("uri"));
-            }
-        }
-        return null;
-    }
     public void UpdateGroupName(Note note,String GroupName){
         db = mHelper.getWritableDatabase();
         Integer id = note.getId();

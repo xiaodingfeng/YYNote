@@ -7,14 +7,6 @@ public class Article   {
     private String ArticleWho;    //来源
     private String Content;
 
-//    public Article(String ArticleTitle, String ArticleUrl, String ArticleWho,String Content) {
-//        this.ArticleTitle = ArticleTitle;
-//        this.ArticleUrl = ArticleUrl;
-//        this.ArticleWho = ArticleWho;
-//        this.Content=Content;
-//    }
-
-
     public String getArticleWho() {
         return ArticleWho;
     }

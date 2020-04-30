@@ -29,10 +29,6 @@ public class AlarmAlertActivity extends AppCompatActivity {
         //创建一个闹钟提醒的对话框,点击确定关闭铃声与页面
         Log.d("进入新的","已经进入");
 
-        /*
-        Toast.makeText(AlarmAlertActivity.this, "闹钟设置完毕~"+ System.currentTimeMillis(),
-                Toast.LENGTH_SHORT).show();
-        */
 
         new AlertDialog.Builder(AlarmAlertActivity.this).setTitle("便签提醒").setMessage(noteContent)
                 .setPositiveButton("关闭闹铃", new DialogInterface.OnClickListener() {

@@ -60,23 +60,10 @@ public class NoteActivity extends AppCompatActivity {
         textView = this.findViewById(R.id.TextView_showNote);
         float WordSize = getWordSize(wordSizePrefs);
         textView.setTextSize(WordSize);
-//        Typeface typeFace =Typeface.createFromAsset(getAssets(), "fonts/fzfsk.ttf");
-//        textView.setTypeface(typeFace);
         String content = note.getContent();
 
-        /*
-        if(content.contains("##")){
-            //这说明便签中含有图片
-
-        }else{
-            textView.setText(content);
-        }
-
-        */
 
         //如果这个便签中包含图片
-
-
 
         //不能识别换行？？/n   replace 因为  Html.fromHtml 无法识别\n
         SpannableString spannableString = ContentToSpannableString.Content2SpanStr(NoteActivity.this, content,true);
@@ -84,12 +71,6 @@ public class NoteActivity extends AppCompatActivity {
         //不加下面这句点击没反应  可点击 字 的实现要求 注意：要位于textView.setText()的前面
         textView.setMovementMethod(LinkMovementMethod.getInstance());
         textView.setText(spannableString);
-
-        //textView.setText(Html.fromHtml(content.replace("\n", "<br/>"),new UriImageGetter(this),null));
-
-        //textView.setText(note.getContent());
-        //String str = textView.getText().toString();
-        //Log.d("textView", "textView" + str);
 
         btn_note_complete = findViewById(R.id.button_note_edit);
         if(notegroupid==3)
@@ -126,10 +107,6 @@ public class NoteActivity extends AppCompatActivity {
         //字体大小默认是20dp  正常    其中 15 dp 对应小     25dp  对应 大    30dp对应超大
         SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
         wordSizePrefs = prefs.getString("WordSize","正常");
-    }
-
-    private void editNote(){
-
     }
 
     @Override
@@ -267,10 +244,7 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void setReminder(){
-//提交测试
-
-        //不知道是什么鬼原理，方正成功了，，醉了，下面的dialog的构造函数的System.currentTimeMillis() 就是 显示在用户dialog上面的基础时间
-        DateTimePickerDialog d = new DateTimePickerDialog(this,System.currentTimeMillis());
+   DateTimePickerDialog d = new DateTimePickerDialog(this,System.currentTimeMillis());
         d.setOnDateTimeSetListener(new DateTimePickerDialog.OnDateTimeSetListener() {
             @Override
             public void OnDateTimeSet(android.app.AlertDialog dialog, long date) {

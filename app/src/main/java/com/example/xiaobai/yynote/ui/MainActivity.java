@@ -133,7 +133,6 @@ public class MainActivity extends AppCompatActivity
 
         dbBus = NoteDbHelpBusiness.getInstance(this);
         refreshNotes();
-
         noteAdapter = new NoteAdapter(notes,this);
         noteAdapter.setOnItemClickListener(new NoteAdapter.OnRecyclerViewItemClickListener() {
             @Override
@@ -206,18 +205,8 @@ public class MainActivity extends AppCompatActivity
         });
 
         recyclerView = findViewById(R.id.recycle_view);
-        //recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         recyclerView.addItemDecoration(new SpacesItemDecoration(3));   //用了card view之后不用再设置分隔线了 不知道上面那句要不要去掉
         recyclerView.setAdapter(noteAdapter);
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//                if(newState==SCROLL_STATE_IDLE){
-//                    noteAdapter.notifyDataSetChanged(); // notify调用后onBindViewHolder会响应调用
-//                }
-//                super.onScrollStateChanged(recyclerView, newState);
-//            }
-//        });
         //根据用户的喜好设置 来刷新 LayoutManager，完成实时刷新
         refreshLayoutManager();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -229,24 +218,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         //调用getHeaderView方法获得Header
         View headerView = navigationView.getHeaderView(0);
-        //通过Header来获取自定义控件
-//        imageView=(ImageView)headerView.findViewById(R.id.imageView) ;
-//        //会报错，路径会加密出错
-////        try {
-////            if (dbBus.seletimage() != null)
-////                imageView.setImageURI(Uri.parse((String) dbBus.seletimage()));
-////        }
-////        catch (Exception e){
-////            throw e;
-////        }
-//        imageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(Intent.ACTION_PICK, null);
-//                intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
-//                startActivityForResult(intent, 2);
-//            }
-//        });
         final TextView textView1=(TextView)headerView.findViewById(R.id.textView2);//date
         final TextView textView2=(TextView)headerView.findViewById(R.id.textView1);//city
         final TextView textView3=(TextView)headerView.findViewById(R.id.textView);//wen
@@ -291,38 +262,20 @@ public class MainActivity extends AppCompatActivity
                 WeatherApi wh = new WeatherApi("https://www.toutiao.com/stream/widget/local_weather/data/", "http://whois.pconline.com.cn/");
                 if (wh.JsonWeather()) {
                     Message msg = new Message();
-//            Bundle data = new Bundle();
-//            data.putString("value", "请求结果");
                     msg.what = 1;
                     handler.sendMessage(msg);
                 }
                 else{
                     Message msg = new Message();
-//            Bundle data = new Bundle();
-//            data.putString("value", "请求结果");
                     msg.what = 0;
                     handler.sendMessage(msg);
                 }
 
             }
             catch (Exception e){
-//                textView1.setText(textView1.getText()+e.toString());
             }
         }
     };
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-//        if (requestCode == 2) {
-//            // 从相册返回的数据
-//            if (data != null) {
-//                // 得到图片的全路径
-//                Uri uri = data.getData();
-//                imageView.setImageURI(uri);
-//                dbBus.updateImage(uri.toString());
-//            }
-//        }
-//    }
-
 
     // 根据组名groupName 刷新数据  notes 对象 ，由于groupName的变化，或者其他增删导致 数据变化 ,合理并不会对搜索框的过滤刷新
     private void refreshNotes(){
@@ -354,19 +307,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.list_mode) {
             showNotesModel = "列表模式";
             SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
@@ -392,8 +340,6 @@ public class MainActivity extends AppCompatActivity
             LinearLayoutManager linerLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
             recyclerView.setLayoutManager(linerLayoutManager);
         }else if(showNotesModel.equals("宫格模式")){
-            //GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
-            //recyclerView.setLayoutManager(gridLayoutManager);
             StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);  //两列，纵向排列
             recyclerView.setLayoutManager(staggeredGridLayoutManager);
         }
@@ -468,7 +414,6 @@ public class MainActivity extends AppCompatActivity
         //刷新数据
         refreshNotes();
         refreshAdapter();
-        //notifacation
     }
 
     private LinkedList<Note> filter(LinkedList<Note> noteList, String text){

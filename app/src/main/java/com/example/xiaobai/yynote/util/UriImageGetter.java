@@ -1,6 +1,7 @@
 package com.example.xiaobai.yynote.util;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.Html;
@@ -24,7 +25,10 @@ public class UriImageGetter implements Html.ImageGetter {
             drawable.setBounds(0,0,2 * drawable.getIntrinsicWidth(),2 * drawable.getIntrinsicHeight());
 
         }catch (Exception FileNotFindException){
-            Log.d("找到图片","不能根据当前Uri找到图片");
+            Resources resource=context.getResources();
+            int resid=resource.getIdentifier("erros","drawable",context.getPackageName());
+            drawable = resource.getDrawable(resid);
+            drawable.setBounds(0,0,2 * drawable.getIntrinsicWidth(),2 * drawable.getIntrinsicHeight());
         }
 
 

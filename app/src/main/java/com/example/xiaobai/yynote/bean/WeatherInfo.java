@@ -51,11 +51,5 @@ public class WeatherInfo {
         this.airquality = airquality;
     }
 
-//    @Override
-//    public String toString() {
-//        return "WeatherInfo [date=" + date + ", cityname=" + cityname
-//                + ", weather=" + weather + ", temperature=" + temperature
-//                + ", airquality=" + airquality +",temperatureNow="+temperatureNow+ "]";
-//    }
 
 }

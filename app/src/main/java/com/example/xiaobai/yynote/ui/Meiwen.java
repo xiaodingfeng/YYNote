@@ -101,90 +101,6 @@ public class Meiwen extends AppCompatActivity {
                 return false;
             }
         });
-//        textView1.setOnTouchListener(new View.OnTouchListener() {
-//
-//            @SuppressLint("WrongConstant")
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    //按下
-//                    case MotionEvent.ACTION_DOWN:
-//                        pressX = event.getX();
-//                        pressY = event.getY();
-//                        break;
-//                    //移动
-//                    case MotionEvent.ACTION_MOVE:
-//                        moveX = event.getX();
-//                        moveY = event.getY();
-//                        break;
-//                    //松开
-//                    case MotionEvent.ACTION_UP:
-//                        if (moveX-pressX > 0 && Math.abs(moveY - pressY) < 250) {
-////                            Log.i("message", "向右");
-////                            if(urlBefor!=null) {
-////                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
-////                                textView1.setText("");
-////                                new Thread(new Runnable() {
-////                                    @Override
-////                                    public void run() {
-////                                        try{
-////                                            if(getArticle(urlBefor)){
-////                                                Message msg = new Message();
-////                                                msg.what = 1;
-////                                                handler.sendMessage(msg);
-////                                            }
-////                                            else{
-////                                                Message msg = new Message();
-////                                                msg.what = 0;
-////                                                handler.sendMessage(msg);
-////                                            }
-////                                        }catch (Exception e){
-////                                            e.printStackTrace();
-////                                        }
-////                                    }
-////                                }).start();
-////
-////                            }
-////                            else
-////                                Toast.makeText(Meiwen.this, "无上一页！", 0).show();
-//                            getNews(urlMeiri);
-//                        } else if (moveX - pressX < 0 && Math.abs(moveY - pressY) < 250) {
-////                            if(urlNext!=null) {
-////                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
-////                                textView1.setText("");
-////                                new Thread(new Runnable() {
-////                                    @Override
-////                                    public void run() {
-////                                        try{
-////                                            if(getArticle(urlNext)){
-////                                                Message msg = new Message();
-////                                                msg.what = 1;
-////                                                handler.sendMessage(msg);
-////                                            }
-////                                            else{
-////                                                Message msg = new Message();
-////                                                msg.what = 0;
-////                                                handler.sendMessage(msg);
-////                                            }
-////                                        }catch (Exception e){
-//////                                            textView1.setText(e.toString());
-////                                            e.printStackTrace();
-////                                        }
-////                                    }
-////                                }).start();
-////
-////                            }
-////                            else
-////                                Toast.makeText(Meiwen.this, "无下一页！", 0).show();
-//                            getNews(urlMeiri);
-//                        }
-//                        break;
-//                    default:
-//                        break;
-//                }
-//                return true;
-//            }
-//        });
         relativeLayout.setOnTouchListener(new View.OnTouchListener() {
 
             @SuppressLint("WrongConstant")
@@ -204,62 +120,8 @@ public class Meiwen extends AppCompatActivity {
                     //松开
                     case MotionEvent.ACTION_UP:
                         if (moveX-pressX > 0 && Math.abs(moveY - pressY) < 250) {
-//                            Log.i("message", "向右");
-//                            if(urlBefor!=null) {
-//                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
-//                                textView1.setText("");
-//                                new Thread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        try{
-//                                            if(getArticle(urlBefor)){
-//                                                Message msg = new Message();
-//                                                msg.what = 1;
-//                                                handler.sendMessage(msg);
-//                                            }
-//                                            else{
-//                                                Message msg = new Message();
-//                                                msg.what = 0;
-//                                                handler.sendMessage(msg);
-//                                            }
-//                                        }catch (Exception e){
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                }).start();
-//
-//                            }
-//                            else
-//                                Toast.makeText(Meiwen.this, "无上一页！", 0).show();
                             getNews(urlMeiri);
                         } else if (moveX - pressX < 0 && Math.abs(moveY - pressY) < 250) {
-//                            if(urlNext!=null) {
-//                                textView.setText("\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
-//                                textView1.setText("");
-//                                new Thread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        try{
-//                                            if(getArticle(urlNext)){
-//                                                Message msg = new Message();
-//                                                msg.what = 1;
-//                                                handler.sendMessage(msg);
-//                                            }
-//                                            else{
-//                                                Message msg = new Message();
-//                                                msg.what = 0;
-//                                                handler.sendMessage(msg);
-//                                            }
-//                                        }catch (Exception e){
-////                                            textView1.setText(e.toString());
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-//                                }).start();
-//
-//                            }
-//                            else
-//                                Toast.makeText(Meiwen.this, "无下一页！", 0).show();
                             getNews(urlMeiri);
                         }
                         break;
@@ -276,7 +138,6 @@ public class Meiwen extends AppCompatActivity {
         textView.setText("\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
         textView1.setText("");
         textView2.setText("");
-//        getNews("http://www.xiaole8.com/");
         getNews(urlMeiri);
         SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
         wordSizePrefs = prefs.getString("WordSizeToMeiwen","正常");
@@ -354,52 +215,6 @@ public class Meiwen extends AppCompatActivity {
             @Override
             public void run() {
                 try{
-                    //笑了吧文章网
-//                    Document doc3 =getJsoupDocGet(url);
-//                    Element menu=doc3.selectFirst("div.menu");
-//                    Element ul=menu.selectFirst("ul");
-//                    Elements li=ul.select("li");
-//                    int m= (int)(1+Math.random()*li.size());
-////                   int i= (int)(1+Math.random()*(36-1+1));
-//                    String uri1=li.get(m).select("a").attr("href");
-//                   Document doc2 =getJsoupDocGet(uri1);
-//                    if (doc2!=null){
-//                    Elements strong=doc2.select("span.pageinfo");
-//                    Element strong1=strong.select("strong").first();
-//                    String str=strong1.text();
-//                    int max= Integer.parseInt(str);
-//                    int i= (int)(1+Math.random()*(max-1+1));
-//                    Document doc =getJsoupDocGet(uri1+"page_"+Integer.toString(i)+".html");
-//                   if (doc!=null) {
-//
-//                       Element titleLinks = doc.selectFirst("ul.l2");
-//                       Elements titlelins = titleLinks.select("li");
-//                       int j = (int) (Math.random() * titlelins.size());
-//                       String uri = titlelins.get(j).select("a").attr("href");
-//                       if(getArticle(uri)) {
-//                           Message msg = new Message();
-//                           msg.what = 1;
-//                           handler.sendMessage(msg);
-//                       }
-//                       else {
-//                           Message msg = new Message();
-//                           msg.what = 0;
-//                           handler.sendMessage(msg);
-//                       }
-//                   }
-//                   else
-//                   {
-//                       Message msg = new Message();
-//                       msg.what = 0;
-//                       handler.sendMessage(msg);
-//                   }
-//                    }
-//                    else
-//                    {
-//                        Message msg = new Message();
-//                        msg.what = 0;
-//                        handler.sendMessage(msg);
-//                    }
                     //每日一文文章网
                     Document doc3 =getJsoupDocGet(url);
                     if(doc3!=null) {
@@ -434,47 +249,5 @@ public class Meiwen extends AppCompatActivity {
                 }
             }
         }).start();
-    }
-    @SuppressLint("WrongConstant")
-    private boolean getArticle(String uri){
-        try {
-            Document doc1 = getJsoupDocGet(uri);
-            Element title = doc1.selectFirst("div.channel");
-            String title1 = title.selectFirst("div.title").text();
-            Element ntitle = doc1.selectFirst("div.ntitle");
-            Element ntitle1 = ntitle.selectFirst("ul");
-            Elements ntitle2 = ntitle1.select("li");
-            try {
-                urlBefor = ntitle2.get(0).select("a").attr("href");
-            }
-            catch (Exception e){
-                urlBefor=null;
-            }
-            try {
-                urlNext = ntitle2.get(1).select("a").attr("href");
-            }
-            catch (Exception e){
-                urlNext=null;
-            }
-            String mainarctile = doc1.select("div.wzcon").select("p").html();
-//            String laiyuan = doc1.select("div.info").text();
-            Pattern pattern = Pattern.compile("<br>|<a(.+?)</a>");
-            Pattern pattern1 = Pattern.compile("<b>|</b>|&nbsp;|<font(.+?)>|</font>|笑话大全|<strong>|</strong>");
-//正则表达式的匹配一定要是这样，单个替换\r|\n的时候会错误
-            Matcher matcher = pattern.matcher(mainarctile);
-            String newString = matcher.replaceAll("\n");
-            Matcher matcher1 = pattern1.matcher(newString);
-            newString = matcher1.replaceAll("");
-//                    mainarctile=mainarctile.replaceAll("/<br\\>g","\n\n");
-            article.setArticleTitle(title1);
-//            article.setArticleUrl(uri);
-//            article.setArticleWho(laiyuan);
-            article.setArticleContent(newString);
-            return true;
-        }
-        catch (Exception e){
-            Toast.makeText(Meiwen.this, e.toString(), 0).show();
-            return false;
-        }
     }
 }

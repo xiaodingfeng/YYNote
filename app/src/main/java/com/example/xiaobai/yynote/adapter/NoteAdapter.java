@@ -31,11 +31,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> im
     private  NoteDbHelpBusiness dbBus = null;
     private OnRecyclerViewItemClickListener mOnItemClickListener;
     private OnRecyclerViewItemLongClickListener mOnItemLongClickListener;
-//    private boolean isScrolling = false;
-//
-//    public void setScrolling(boolean scrolling) {
-//        isScrolling = scrolling;
-//    }
+
     private static final int[] colors = new int[]{R.color.color_0,R.color.color_1,
             R.color.color_2,R.color.color_3,R.color.color_4,
             R.color.color_5,R.color.color_6,R.color.color_7,

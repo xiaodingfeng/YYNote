@@ -286,6 +286,7 @@ public class NoteNewActivity extends AppCompatActivity {
     }
 
     private void callGallery(){
+        //知乎开源项目打开图片
         glideImageEngine = new GlideImageEngine();
 
         Matisse.from(NoteNewActivity.this)
@@ -296,6 +297,7 @@ public class NoteNewActivity extends AppCompatActivity {
                 .thumbnailScale(0.85f)
                 .imageEngine(glideImageEngine)
                 .forResult(REQUEST_CODE_CHOOSE);
+        //自带打开图片
 //        Intent intentFromGallery = new Intent();
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {//4.4及以上
 //            intentFromGallery.setAction(Intent.ACTION_PICK);
@@ -316,16 +318,8 @@ public class NoteNewActivity extends AppCompatActivity {
                 }else if(requestCode == REQUEST_CODE_CHOOSE){
                     mSelected = Matisse.obtainResult(data);
                     Uri nSelected = mSelected.get(0);
-//                    Uri nSelected =data.getData();
-                    //用Uri的string来构造spanStr，不知道能不能获得图片
-                    //  ## +  string +  ##  来标识图片  <img src=''>
-
-                    //SpannableString spanStr = new SpannableString(nSelected.toString());
                     SpannableString spanStr = new SpannableString("<img src='" + nSelected.toString() + "'/>");
                     Log.d("图片Uri",nSelected.toString());
-//                    String path = UriToPathUtil.getRealFilePath(this,nSelected);
-//                    Log.d("图片Path",path);
-
                     try{
                         WindowManager windowManager = (WindowManager) (NoteNewActivity.this).getSystemService(Context.WINDOW_SERVICE);
                         Display defaultDisplay = windowManager.getDefaultDisplay();
@@ -337,9 +331,6 @@ public class NoteNewActivity extends AppCompatActivity {
                         //x/t=y/z
                         Drawable drawable = Drawable.createFromStream(this.getContentResolver().openInputStream(nSelected),null);
                         drawable.setBounds(x/10,0,x*9/10,drawable.getIntrinsicHeight()*9*x/(drawable.getIntrinsicWidth()*10));
-                        //BitmapDrawable bd = (BitmapDrawable) drawable;
-                        //Bitmap bp = bd.getBitmap();
-                        //bp.setDensity(160);
                         ImageSpan span = new ImageSpan(drawable,ImageSpan.ALIGN_BASELINE);
                         spanStr.setSpan(span,0,spanStr.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         Log.d("spanString：",spanStr.toString());
@@ -354,7 +345,6 @@ public class NoteNewActivity extends AppCompatActivity {
                     }catch (Exception FileNotFoundException){
                         Log.d("异常","无法根据Uri找到图片资源");
                     }
-                    //Drawable drawable = NoteNewActivity.this.getResources().getDrawable(nSelected);
                 }
             }
         }
@@ -362,7 +352,6 @@ public class NoteNewActivity extends AppCompatActivity {
     @SuppressLint("SdCardPath")
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void startRecord(){
-
 
         if(mediaRecorder == null){
             boolean hasSDCard = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
