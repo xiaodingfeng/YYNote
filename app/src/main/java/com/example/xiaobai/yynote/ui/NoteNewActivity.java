@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.media.MediaRecorder;
@@ -33,6 +34,7 @@ import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -69,11 +71,19 @@ public class NoteNewActivity extends AppCompatActivity {
     private MediaRecorder mediaRecorder = null;
     private int REQUEST_PERMISSION_CODE;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_new);
-
+        Window window = this.getWindow();
+        //清除透明状态栏
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        //设置状态栏颜色必须添加
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);//设置透明
         ActivityCompat.requestPermissions(NoteNewActivity.this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO},
                 REQUEST_PERMISSION_CODE);
@@ -86,6 +96,7 @@ public class NoteNewActivity extends AppCompatActivity {
         setSupportActionBar(toolbar_note_new);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+//        getSupportActionBar().setElevation(0);
         toolbar_note_new.setNavigationOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
@@ -213,9 +224,11 @@ public class NoteNewActivity extends AppCompatActivity {
             String title;
             Pattern voice = Pattern.compile("<voice src='(.*?)'/>");
             Matcher mVoice = voice.matcher(Contents);
+            boolean count1=mVoice.find();
             Contents = mVoice.replaceAll("");
             Pattern img = Pattern.compile("<img src='(.*?)'/>");
             Matcher mImg = img.matcher(Contents);
+            boolean count2=mImg.find();
             Contents = mImg.replaceAll("");
             int k = 0;
             for (i = 0; i < Contents.length(); i++) {
@@ -227,7 +240,10 @@ public class NoteNewActivity extends AppCompatActivity {
                 }
             }
             title = Contents.substring(k, i);
-
+            if(count2)
+                title="图片便签";
+            if(count1)
+                title="语音便签";
             String subContent;
             if (i < Contents.length()) {
                 int j = 0;

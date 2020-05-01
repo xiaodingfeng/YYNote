@@ -5,11 +5,15 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -20,6 +24,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,17 +44,26 @@ public class NoteActivity extends AppCompatActivity {
     private long date1;
     private  int notegroupid=0;
     FloatingActionButton btn_note_complete;
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_show);
-
+        Window window = this.getWindow();
+        //清除透明状态栏
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        //设置状态栏颜色必须添加
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);//设置透明
         initData();
 
         Toolbar toolbar_note_show = (Toolbar)findViewById(R.id.toolbar_note_show);
         setSupportActionBar(toolbar_note_show);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+//        getSupportActionBar().setElevation(0);
         toolbar_note_show.setNavigationOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {

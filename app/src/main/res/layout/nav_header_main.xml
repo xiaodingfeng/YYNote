@@ -5,7 +5,7 @@
     android:id="@+id/LayoutHeader"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/side_nav_bar"
+    android:background="@color/colorPrimary"
     android:orientation="vertical"
     android:paddingLeft="5dp"
     android:paddingTop="30dp"

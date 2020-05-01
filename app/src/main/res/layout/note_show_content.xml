@@ -7,7 +7,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ui.NoteActivity"
     tools:showIn="@layout/note_show"
-    android:theme="@style/AppTheme.NoActionBar">
+    android:theme="@style/AppTheme">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lineSpacingExtra="5dp"
+        android:background="@color/TextBar"
         android:textColor="@color/black"
         android:visibility="visible"
         android:layout_marginTop="20dp"

@@ -63,6 +63,8 @@ public class Meiwen extends AppCompatActivity {
         //设置状态栏颜色必须添加
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(Color.TRANSPARENT);//设置透明
+        //设置状态栏文字颜色及图标为深色
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
         textView=(TextView)findViewById(R.id.textView2);
         textView1=(TextView)findViewById(R.id.textView4);

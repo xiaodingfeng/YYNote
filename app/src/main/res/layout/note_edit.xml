@@ -4,22 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/backgroud2"
+    android:background="@drawable/back1"
     tools:context=".ui.NoteNewActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="0.6"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:background="@color/TextBar"
+        app:elevation="0dp"
+        android:theme="@style/AppTheme">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar_note_new"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:alpha="0.6"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            app:elevation="0dp"
+            app:popupTheme="@style/AppTheme" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

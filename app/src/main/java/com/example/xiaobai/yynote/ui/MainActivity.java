@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +30,8 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +47,7 @@ import com.simple.spiderman.CrashModel;
 import com.simple.spiderman.SpiderMan;
 
 import java.util.LinkedList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener ,View.OnClickListener {
@@ -63,11 +67,14 @@ public class MainActivity extends AppCompatActivity
                              Bundle savedInstanceState) {
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"SetTextI18n", "HandlerLeak", "WrongConstant"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+//        Objects.requireNonNull(getSupportActionBar()).setElevation(0);
         //弹出崩溃信息展示界面
         SpiderMan.getInstance()
                 .init(this)
@@ -88,6 +95,7 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "网络可用", 0).show();
          toolbar_main = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar_main);
+
         //用户喜好  首页面 notes布局显示  第一次默认 宫格模式
         SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
         showNotesModel = prefs.getString("ShowNotesModel","宫格模式");
