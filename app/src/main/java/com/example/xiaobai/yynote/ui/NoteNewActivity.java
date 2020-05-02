@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -46,7 +47,6 @@ import com.example.xiaobai.yynote.db.NoteDbHelpBusiness;
 import com.example.xiaobai.yynote.util.CommonUtil;
 import com.example.xiaobai.yynote.util.ContentToSpannableString;
 import com.example.xiaobai.yynote.util.GlideImageEngine;
-import com.example.xiaobai.yynote.util.UriToPathUtil;
 import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
@@ -149,8 +149,15 @@ public class NoteNewActivity extends AppCompatActivity {
         addPic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (PackageManager.PERMISSION_GRANTED != ActivityCompat.checkSelfPermission(NoteNewActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    ActivityCompat.requestPermissions(NoteNewActivity.this,
+                            new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE},
+                            REQUEST_PERMISSION_CODE);
+                }
                 //跳转到 图片选择界面 向当前editText中插入图片
-                callGallery();
+                else {
+                    callGallery();
+                }
             }
         });
 
@@ -160,18 +167,25 @@ public class NoteNewActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
-                if(!isStart){
-                    startRecord();
-                    addVoice.setText("停止录音");
-                    isStart = true;
-                    editText.append("\n");
-                }else{
-                    stopRecord();
-                    addVoice.setText("开始录音");
-                    isStart = false;
-                    //这是手机emoji上的一个图标
-                    editText.append("\uD83C\uDFA4");
-                    editText.append("\n");
+                if (PackageManager.PERMISSION_GRANTED != ActivityCompat.checkSelfPermission(NoteNewActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    ActivityCompat.requestPermissions(NoteNewActivity.this,
+                            new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            REQUEST_PERMISSION_CODE);
+                }
+                else {
+                    if (!isStart) {
+                        startRecord();
+                        addVoice.setText("停止录音");
+                        isStart = true;
+                        editText.append("\n");
+                    } else {
+                        stopRecord();
+                        addVoice.setText("开始录音");
+                        isStart = false;
+                        //这是手机emoji上的一个图标
+                        editText.append("\uD83C\uDFA4");
+                        editText.append("\n");
+                    }
                 }
             }
         });
@@ -333,7 +347,8 @@ public class NoteNewActivity extends AppCompatActivity {
 
                 }else if(requestCode == REQUEST_CODE_CHOOSE){
                     mSelected = Matisse.obtainResult(data);
-                    Uri nSelected = mSelected.get(0);
+                    for(int i=0;i<mSelected.size();i++){
+                    Uri nSelected = mSelected.get(i);
                     SpannableString spanStr = new SpannableString("<img src='" + nSelected.toString() + "'/>");
                     Log.d("图片Uri",nSelected.toString());
                     try{
@@ -360,6 +375,7 @@ public class NoteNewActivity extends AppCompatActivity {
                         editText.requestFocus();//获取焦点
                     }catch (Exception FileNotFoundException){
                         Log.d("异常","无法根据Uri找到图片资源");
+                    }
                     }
                 }
             }

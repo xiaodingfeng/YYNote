@@ -1,12 +1,19 @@
 package com.example.xiaobai.yynote.ui;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -17,8 +24,12 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.text.SpannableString;
+import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -34,15 +45,22 @@ import com.example.xiaobai.yynote.bean.Note;
 import com.example.xiaobai.yynote.db.NoteDbHelpBusiness;
 import com.example.xiaobai.yynote.util.ContentToSpannableString;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Calendar;
+import java.util.Locale;
+
 
 public class NoteActivity extends AppCompatActivity {
     Note note = null;
     TextView textView;
     String wordSizePrefs;
+    private Context mContext;
     private AlarmManager alarmManager;
     private PendingIntent pi;
     private long date1;
     private  int notegroupid=0;
+    private int REQUEST_PERMISSION_CODE;
     FloatingActionButton btn_note_complete;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -130,6 +148,88 @@ public class NoteActivity extends AppCompatActivity {
         return true;
     }
 
+
+    public Bitmap viewSaveToImage(View view) {
+        view.setDrawingCacheEnabled(true);
+        view.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        view.setDrawingCacheBackgroundColor(Color.WHITE);
+
+// 把一个View转换成图片
+        Bitmap cachebmp = loadBitmapFromView(view);
+
+// 添加水印
+        Bitmap bitmap = Bitmap.createBitmap(createWatermarkBitmap(cachebmp,
+                "@ YYNote"));
+
+        FileOutputStream fos;
+        try {
+// 判断手机设备是否有SD卡
+            boolean isHasSDCard = Environment.getExternalStorageState().equals(
+                    android.os.Environment.MEDIA_MOUNTED);
+            if (isHasSDCard) {
+// SD卡根目录
+                File sdRoot = Environment.getExternalStorageDirectory();
+                File file = new File(sdRoot, DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA)) +".PNG");
+                fos = new FileOutputStream(file);
+            } else
+                throw new Exception("创建文件失败!");
+
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+
+            fos.flush();
+            fos.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        view.destroyDrawingCache();
+        return bitmap;
+    }
+
+    private Bitmap loadBitmapFromView(View v) {
+        int w = v.getWidth();
+        int h = v.getHeight();
+
+        Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmp);
+
+        c.drawColor(Color.WHITE);
+/** 如果不设置canvas画布为白色，则生成透明 */
+
+        v.layout(0, 0, w, h);
+        v.draw(c);
+
+        return bmp;
+    }
+
+    // 为图片target添加水印
+    private Bitmap createWatermarkBitmap(Bitmap target, String str) {
+        int w = target.getWidth();
+        int h = target.getHeight();
+
+        Bitmap bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bmp);
+
+        Paint p = new Paint();
+
+// 水印的颜色
+        p.setColor(Color.RED);
+
+// 水印的字体大小
+        p.setTextSize(40);
+
+        p.setAntiAlias(true);// 去锯齿
+
+        canvas.drawBitmap(target, 0, 0, p);
+
+// 在中间位置开始添加水印
+        canvas.drawText(str, w / 2, h / 2, p);
+
+        canvas.save();
+        canvas.restore();
+
+        return bmp;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -222,10 +322,38 @@ public class NoteActivity extends AppCompatActivity {
             alertDialog.show();
         }else if(id == R.id.show_menu_share){
             //由于qq，微信需要注册，所以暂时没弄 只能分享到系统自带的应用中
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, note.getContent());
-            startActivity(intent.createChooser(intent,"分享到"));
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(NoteActivity.this);
+            AlertDialog alertDialog = builder.setTitle("选择分享方式：")
+                    .setNegativeButton("图片", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (PackageManager.PERMISSION_GRANTED != ActivityCompat.checkSelfPermission(NoteActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                                ActivityCompat.requestPermissions(NoteActivity.this,
+                                        new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                        REQUEST_PERMISSION_CODE);
+                            }
+                            else{
+                                Intent intent = new Intent(Intent.ACTION_SEND);
+                                Uri uriToImage = Uri.parse(MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), viewSaveToImage(textView), null, null));
+                                intent.setType("image/*");
+                                intent.putExtra(Intent.EXTRA_STREAM, uriToImage);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent.createChooser(intent, "分享到"));
+
+                            }
+                                }
+                    })
+                    .setPositiveButton("文本", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent = new Intent(Intent.ACTION_SEND);
+                            intent.setType("text/plain");
+                            intent.putExtra(Intent.EXTRA_TEXT, note.getContent());
+                            startActivity(intent.createChooser(intent,"分享到"));
+                        }
+                    }).create();
+            alertDialog.show();
         }else if (id == R.id.show_menu_remind){
             //后台 service
             //计时 AlarmManager

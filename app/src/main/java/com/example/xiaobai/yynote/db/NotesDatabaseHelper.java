@@ -29,9 +29,6 @@ public class NotesDatabaseHelper extends SQLiteOpenHelper {
         String CREATE_NOTE_TABLE =
                 "CREATE TABLE note(id INTEGER PRIMARY KEY AUTOINCREMENT,title VARCHAR(30),subContent VARCHAR(30),content text, groupName VARCHAR(20), createTime VARCHAR(20))";
         sqLiteDatabase.execSQL(CREATE_NOTE_TABLE);
-        CREATE_NOTE_TABLE=
-                "CREATE TABLE Touxiang(uri text)";
-        sqLiteDatabase.execSQL(CREATE_NOTE_TABLE);
     }
 
     @Override

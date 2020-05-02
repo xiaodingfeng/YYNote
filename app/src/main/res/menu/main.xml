@@ -16,6 +16,12 @@
     <item
         android:id="@+id/Article"
         android:orderInCategory="100"
-        android:title="轻阅读"
+        android:title="每日一文"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/backgroudimage"
+        android:orderInCategory="150"
+        android:title="设置背景"
+        app:showAsAction="never"/>
+
 </menu>

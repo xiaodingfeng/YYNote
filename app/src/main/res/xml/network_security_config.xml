@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-
+<!-- 这是用来突破http访问网络-->
 <network-security-config>
     <base-config cleartextTrafficPermitted="true" />
 </network-security-config>

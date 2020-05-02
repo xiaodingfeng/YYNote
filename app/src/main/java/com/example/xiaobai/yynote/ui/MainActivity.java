@@ -1,19 +1,27 @@
 package com.example.xiaobai.yynote.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.example.xiaobai.yynote.util.GlideImageEngine;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
@@ -45,9 +53,14 @@ import com.example.xiaobai.yynote.util.NetworkUtil;
 import com.example.xiaobai.yynote.view.SpacesItemDecoration;
 import com.simple.spiderman.CrashModel;
 import com.simple.spiderman.SpiderMan;
+import com.zhihu.matisse.Matisse;
+import com.zhihu.matisse.MimeType;
 
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener ,View.OnClickListener {
@@ -62,7 +75,9 @@ public class MainActivity extends AppCompatActivity
     ImageView imageView;
     String showNotesModel;
     RecyclerView recyclerView;
-
+    private GlideImageEngine glideImageEngine;
+    private int REQUEST_CODE_CHOOSE = 23;
+    private int REQUEST_PERMISSION_CODE;
     public void onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -74,6 +89,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        Window window = this.getWindow();
+        //清除透明状态栏
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        //设置状态栏颜色必须添加
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(Color.TRANSPARENT);//设置透明
 //        Objects.requireNonNull(getSupportActionBar()).setElevation(0);
         //弹出崩溃信息展示界面
         SpiderMan.getInstance()
@@ -93,13 +116,28 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "网络不可用", 0).show();
         else
             Toast.makeText(this, "网络可用", 0).show();
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO},
+                REQUEST_PERMISSION_CODE);
          toolbar_main = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar_main);
-
-        //用户喜好  首页面 notes布局显示  第一次默认 宫格模式
+        CoordinatorLayout coordinatorLayout=(CoordinatorLayout)findViewById(R.id.layout1);
         SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
+        if(prefs.getString("imageuri", null)==null)
+        coordinatorLayout.setBackground(getResources().getDrawable(R.drawable.back2));
+        else{
+            Uri nSelected=Uri.parse(prefs.getString("imageuri", null));
+            try {
+                Drawable drawable = Drawable.createFromStream(this.getContentResolver().openInputStream(nSelected), null);
+                coordinatorLayout.setBackground(drawable);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        //用户喜好  首页面 notes布局显示  第一次默认 宫格模式
         showNotesModel = prefs.getString("ShowNotesModel","宫格模式");
         SearchView searchView =  findViewById(R.id.search_view);
+        searchView.bringToFront();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -114,7 +152,6 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
-
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
@@ -228,42 +265,36 @@ public class MainActivity extends AppCompatActivity
         final TextView textView4=(TextView)headerView.findViewById(R.id.textView3);//Pm
         final TextView textView5=(TextView)headerView.findViewById(R.id.textView4);//now
         final TextView textView6=(TextView)headerView.findViewById(R.id.textView5);//Tianqi
-        new Thread(networkTask).start();
+        timer.schedule(task,0,60000);
         handler = new Handler() {
             @SuppressLint("SetTextI18n")
             @Override
             public void handleMessage(Message msg) {
                 if (msg.what == 1) {
-                    textView1.setText(textView1.getText()+(WeatherApi.weatherInfo.getDate()==null?"获取失败":WeatherApi.weatherInfo.getDate()));
-                    textView2.setText(textView2.getText()+(WeatherApi.weatherInfo.getCityname()==null?"获取失败":WeatherApi.weatherInfo.getCityname()));
-                    textView3.setText(textView3.getText()+(WeatherApi.weatherInfo.getTemperature()==null?"获取失败":WeatherApi.weatherInfo.getTemperature()));
-                    textView4.setText(textView4.getText()+(WeatherApi.weatherInfo.getAirquality()==null?"获取失败":WeatherApi.weatherInfo.getAirquality()));
-                    textView5.setText(textView5.getText()+(WeatherApi.weatherInfo.gettemperatureNow()==null?"获取失败":WeatherApi.weatherInfo.gettemperatureNow()));
-                    textView6.setText(textView6.getText()+(WeatherApi.weatherInfo.getWeather()==null?"获取失败":WeatherApi.weatherInfo.getWeather()));
+                    textView1.setText("日期："+(WeatherApi.weatherInfo.getDate()==null?"获取失败":WeatherApi.weatherInfo.getDate()));
+                    textView2.setText("城市："+(WeatherApi.weatherInfo.getCityname()==null?"获取失败":WeatherApi.weatherInfo.getCityname()));
+                    textView3.setText("气温："+(WeatherApi.weatherInfo.getTemperature()==null?"获取失败":WeatherApi.weatherInfo.getTemperature()));
+                    textView4.setText("PM2.5指数："+(WeatherApi.weatherInfo.getAirquality()==null?"获取失败":WeatherApi.weatherInfo.getAirquality()));
+                    textView5.setText("实时温度："+(WeatherApi.weatherInfo.gettemperatureNow()==null?"获取失败":WeatherApi.weatherInfo.gettemperatureNow()));
+                    textView6.setText("天气："+(WeatherApi.weatherInfo.getWeather()==null?"获取失败":WeatherApi.weatherInfo.getWeather()));
                 }
                 else if(msg.what == 0){
-                    textView1.setText(textView1.getText()+"获取超时");
-                    textView2.setText(textView2.getText()+"获取超时");
-                    textView3.setText(textView3.getText()+"获取超时");
-                    textView4.setText(textView4.getText()+"获取超时");
-                    textView5.setText(textView5.getText()+"获取超时");
-                    textView6.setText(textView6.getText()+"获取超时");
+                    textView1.setText("日期："+"获取超时");
+                    textView2.setText("城市："+"获取超时");
+                    textView3.setText("气温："+"获取超时");
+                    textView4.setText("PM2.5指数："+"获取超时");
+                    textView5.setText("实时温度："+"获取超时");
+                    textView6.setText("天气："+"获取超时");
                 }
 
             }
         };
     }
-    /**
-     * 网络操作相关的子线程
-     */
-    Runnable networkTask = new Runnable() {
-
+    Timer timer = new Timer();
+    TimerTask task = new TimerTask() {
         @Override
         public void run() {
-            // TODO
-            // 在这里进行 http request.网络请求相关操作
             try {
-
                 WeatherApi wh = new WeatherApi("https://www.toutiao.com/stream/widget/local_weather/data/", "http://whois.pconline.com.cn/");
                 if (wh.JsonWeather()) {
                     Message msg = new Message();
@@ -275,9 +306,10 @@ public class MainActivity extends AppCompatActivity
                     msg.what = 0;
                     handler.sendMessage(msg);
                 }
-
-            }
-            catch (Exception e){
+            } catch (Exception e) {
+                Message msg = new Message();
+                msg.what = 0;
+                handler.sendMessage(msg);
             }
         }
     };
@@ -337,8 +369,72 @@ public class MainActivity extends AppCompatActivity
         }else if(id==R.id.Article){
             Intent intent = new Intent(MainActivity.this, Meiwen.class);
             startActivity(intent);
+        }else if(id==R.id.backgroudimage){
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            AlertDialog alertDialog = builder.setTitle("请选择：")
+                    .setNegativeButton("默认", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            CoordinatorLayout coordinatorLayout=(CoordinatorLayout)findViewById(R.id.layout1);
+                            coordinatorLayout.setBackground(getResources().getDrawable(R.drawable.back2));
+                            SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("imageuri",null);
+                            editor.apply();         //editor.commit();
+                        }
+                    })
+                    .setPositiveButton("自定义", new DialogInterface.OnClickListener() {
+                        @SuppressLint("WrongConstant")
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            if (PackageManager.PERMISSION_GRANTED != ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                                ActivityCompat.requestPermissions(MainActivity.this,
+                                        new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE},
+                                        REQUEST_PERMISSION_CODE);
+                            }
+                            else{
+                                //知乎开源项目打开图片
+                                glideImageEngine = new GlideImageEngine();
+
+                                Matisse.from(MainActivity.this)
+                                        .choose(MimeType.ofAll())
+                                        .countable(true)
+                                        .maxSelectable(9)
+                                        .restrictOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+                                        .thumbnailScale(0.85f)
+                                        .imageEngine(glideImageEngine)
+                                        .forResult(REQUEST_CODE_CHOOSE);
+                            }
+                            }
+                    }).create();
+            alertDialog.show();
         }
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if(resultCode == RESULT_OK){
+            if(data != null){
+                if(requestCode == 1){
+
+                }else if(requestCode == REQUEST_CODE_CHOOSE){
+                    Uri nSelected = Matisse.obtainResult(data).get(0);
+                    try{
+                        Drawable drawable = Drawable.createFromStream(this.getContentResolver().openInputStream(nSelected),null);
+                        CoordinatorLayout coordinatorLayout=(CoordinatorLayout)findViewById(R.id.layout1);
+                        coordinatorLayout.setBackground(drawable);
+                        SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("imageuri",nSelected.toString());
+                        editor.apply();         //editor.commit();
+                    }catch (Exception FileNotFoundException){
+                        FileNotFoundException.printStackTrace();
+                    }
+                }
+            }
+        }
     }
     public void refreshLayoutManager(){
         if(showNotesModel.equals("列表模式")){
@@ -379,18 +475,28 @@ public class MainActivity extends AppCompatActivity
             //由于qq，微信需要注册，所以暂时没弄 只能分享到系统自带的应用中
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, "https://xioabaibuai.lanzous.com/b00zen0sb");
+            intent.putExtra(Intent.EXTRA_TEXT, "一款界面唯美的简易便签APP\n\n" +
+                    "请复制到浏览器下载\n\n" +
+                    "https://xioabaibuai.lanzous.com/b00zen0sb");
             startActivity(intent.createChooser(intent,"分享到"));
         } else if (id == R.id.nav_aboutWriter) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             AlertDialog alertDialog = builder.setTitle("关于作者：")
-                    .setMessage("华东交通大学\n\n肖定峰").create();
+                    .setMessage("华东交通大学： " +
+                            "肖定峰\n\n已开源，Github地址：https://github.com/xiaodingfeng/YYNote.git").create();
             alertDialog.show();
         }
         else if(id == R.id.nav_aboutApp){
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             AlertDialog alertDialog = builder.setTitle("帮助文档")
-                    .setMessage("书写便签时，直接返回也可保存便签\n\n非回收站便签长按可删除，加入回收站\n\n回收站便签长按可恢复，也可永久删除\n\n便签内页可设置提醒功能，取消提醒，设置文字大小，移动分组\n\n主界面菜单设置轻阅读，左滑或者右滑随机一篇美文\n\n左侧分组目录头添加天气，需要移动网络才能准确定位").create();
+                    .setMessage("书写便签时，直接返回也可保存便签\n\n" +
+                            "非回收站便签长按可删除，加入回收站\n\n" +
+                            "回收站便签长按可恢复，也可永久删除\n\n" +
+                            "便签内页可设置提醒功能，取消提醒，设置文字大小，移动分组\n\n" +
+                            "主界面菜单设置每日一文，标题栏左滑或者右滑随机一篇美文\n\n" +
+                            "正文长按设置字体大小\n\n" +
+                            "左侧分组目录头添加天气，需要移动网络才能准确定位，一分钟更新\n\n" +
+                            "菜单设置主页面背景").create();
             alertDialog.show();
         }
 
