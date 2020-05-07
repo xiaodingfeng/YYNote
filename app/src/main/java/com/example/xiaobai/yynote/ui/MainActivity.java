@@ -7,7 +7,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -15,6 +19,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.xiaobai.yynote.util.GlideImageEngine;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -26,6 +34,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,7 +50,11 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,8 +71,10 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -68,7 +84,6 @@ public class MainActivity extends AppCompatActivity
     NoteDbHelpBusiness dbBus;
     NetworkUtil networkUtil;
     private Handler handler;
-//    WeatherInfo weatherInfo;
     private LinkedList<Note> notes;
     private String groupName = "全部";
     public  Toolbar toolbar_main;
@@ -76,6 +91,7 @@ public class MainActivity extends AppCompatActivity
     String showNotesModel;
     RecyclerView recyclerView;
     private GlideImageEngine glideImageEngine;
+    SimpleTarget<Drawable> simpleTarget;
     private int REQUEST_CODE_CHOOSE = 23;
     private int REQUEST_PERMISSION_CODE;
     public void onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,15 +105,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        Window window = this.getWindow();
-        //清除透明状态栏
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        //设置状态栏颜色必须添加
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(Color.TRANSPARENT);//设置透明
-//        Objects.requireNonNull(getSupportActionBar()).setElevation(0);
         //弹出崩溃信息展示界面
         SpiderMan.getInstance()
                 .init(this)
@@ -121,14 +128,24 @@ public class MainActivity extends AppCompatActivity
                 REQUEST_PERMISSION_CODE);
          toolbar_main = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar_main);
-        CoordinatorLayout coordinatorLayout=(CoordinatorLayout)findViewById(R.id.layout1);
+
+        final CoordinatorLayout coordinatorLayout=(CoordinatorLayout)findViewById(R.id.layout1);
+        simpleTarget = new SimpleTarget<Drawable>() {
+            @Override
+            public void onResourceReady(Drawable resource, Transition<? super Drawable> transition) {
+                coordinatorLayout.setBackground(resource);
+            }
+        };
         SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
-        if(prefs.getString("imageuri", null)==null)
-        coordinatorLayout.setBackground(getResources().getDrawable(R.drawable.back2));
+        if(prefs.getString("imageuri", null)==null){
+            getBingImage(simpleTarget);
+
+        }
         else{
             Uri nSelected=Uri.parse(prefs.getString("imageuri", null));
             try {
                 Drawable drawable = Drawable.createFromStream(this.getContentResolver().openInputStream(nSelected), null);
+
                 coordinatorLayout.setBackground(drawable);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -259,6 +276,12 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         //调用getHeaderView方法获得Header
         View headerView = navigationView.getHeaderView(0);
+        headerView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopWindows(view);
+            }
+        });
         final TextView textView1=(TextView)headerView.findViewById(R.id.textView2);//date
         final TextView textView2=(TextView)headerView.findViewById(R.id.textView1);//city
         final TextView textView3=(TextView)headerView.findViewById(R.id.textView);//wen
@@ -286,10 +309,67 @@ public class MainActivity extends AppCompatActivity
                     textView5.setText("实时温度："+"获取超时");
                     textView6.setText("天气："+"获取超时");
                 }
-
             }
         };
     }
+    private void showPopWindows(View v) {
+
+        /** pop view */
+        View mPopView = LayoutInflater.from(this).inflate(R.layout.dialog, null);
+        final PopupWindow mPopWindow = new PopupWindow(mPopView, ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, true);
+//        /** set */
+        mPopWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        /** 这个很重要 ,获取弹窗的长宽度 */
+        mPopView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        int popupWidth = mPopView.getMeasuredWidth();
+        int popupHeight = mPopView.getMeasuredHeight();
+        /** 获取父控件的位置 */
+        int[] location = new int[2];
+        v.getLocationOnScreen(location);
+        /** 显示位置 */
+        mPopWindow.showAtLocation(v, Gravity.NO_GRAVITY, 0, 0);
+        mPopWindow.update();
+      WebView webView= mPopView.findViewById(R.id.webview);
+        webView.loadUrl("https://apip.weatherdt.com/h5.html?id=wf2umyZZqL");
+        //声明WebSettings子类
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setUseWideViewPort(true); //将图片调整到适合webview的大小
+        webSettings.setLoadWithOverviewMode(true); // 缩放至屏幕的大小
+        webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK); //关闭webview中缓存
+        webSettings.setAllowFileAccess(true); //设置可以访问文件
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true); //支持通过JS打开新窗口
+        webSettings.setLoadsImagesAutomatically(true); //支持自动加载图片
+        webSettings.setDefaultTextEncodingName("utf-8");//设置编码格式
+        //系统默认会通过手机浏览器打开网页，为了能够直接通过WebView显示网页，则必须设置
+        webView.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                //使用WebView加载显示url
+                view.loadUrl(url);
+                //返回true
+                return true;
+            }
+        });
+
+        mPopView.findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                mPopWindow.dismiss();
+            }
+        });
+    }
+    public void getBingImage(SimpleTarget<Drawable> drawableSimpleTarget){
+        Glide.with(this)
+                .load("https://api.dujin.org/bing/m.php")
+                .skipMemoryCache(true)//跳过内存缓存
+                .diskCacheStrategy(DiskCacheStrategy.NONE)//不要在disk硬盘缓存
+                .placeholder(R.color.white)
+                .into(drawableSimpleTarget);
+    }
+
     Timer timer = new Timer();
     TimerTask task = new TimerTask() {
         @Override
@@ -372,11 +452,10 @@ public class MainActivity extends AppCompatActivity
         }else if(id==R.id.backgroudimage){
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             AlertDialog alertDialog = builder.setTitle("请选择：")
-                    .setNegativeButton("默认", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("bing每日一图", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            CoordinatorLayout coordinatorLayout=(CoordinatorLayout)findViewById(R.id.layout1);
-                            coordinatorLayout.setBackground(getResources().getDrawable(R.drawable.back2));
+                            getBingImage(simpleTarget);
                             SharedPreferences prefs = getSharedPreferences("Setting",MODE_PRIVATE);
                             SharedPreferences.Editor editor = prefs.edit();
                             editor.putString("imageuri",null);
