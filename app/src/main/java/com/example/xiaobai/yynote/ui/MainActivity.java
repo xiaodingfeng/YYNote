@@ -50,11 +50,13 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -331,7 +333,8 @@ public class MainActivity extends AppCompatActivity
         mPopWindow.showAtLocation(v, Gravity.NO_GRAVITY, 0, 0);
         mPopWindow.update();
       WebView webView= mPopView.findViewById(R.id.webview);
-        webView.loadUrl("https://apip.weatherdt.com/h5.html?id=wf2umyZZqL");
+        final ProgressBar pg1=mPopView.findViewById(R.id.progressBar1);
+
         //声明WebSettings子类
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -352,14 +355,21 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
-
-        mPopView.findViewById(R.id.button_back).setOnClickListener(new View.OnClickListener() {
-
+        webView.setWebChromeClient(new WebChromeClient(){
             @Override
-            public void onClick(View v) {
-                mPopWindow.dismiss();
+            public void onProgressChanged(WebView view, int newProgress) {
+
+                if(newProgress==100){
+                    pg1.setVisibility(View.GONE);//加载完网页进度条消失
+                }
+                else{
+                    pg1.setVisibility(View.VISIBLE);//开始加载网页时显示进度条
+                    pg1.setProgress(newProgress);//设置进度值
+                }
+
             }
         });
+        webView.loadUrl("https://apip.weatherdt.com/h5.html?id=wf2umyZZqL");
     }
     public void getBingImage(SimpleTarget<Drawable> drawableSimpleTarget){
         Glide.with(this)
