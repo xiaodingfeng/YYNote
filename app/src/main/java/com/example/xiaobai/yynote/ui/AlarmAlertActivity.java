@@ -25,6 +25,7 @@ public class AlarmAlertActivity extends AppCompatActivity {
 
         setContentView(R.layout.test);
         mediaPlayer = mediaPlayer.create(this,R.raw.cute);
+        mediaPlayer.setLooping(true);
         mediaPlayer.start();
         //创建一个闹钟提醒的对话框,点击确定关闭铃声与页面
         Log.d("进入新的","已经进入");

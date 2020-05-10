@@ -134,10 +134,10 @@ public class Meiwen extends AppCompatActivity {
                 return true;
             }
         });
-        Typeface typeFace =Typeface.createFromAsset(getAssets(), "fonts/fzfsk.ttf");
-        textView.setTypeface(typeFace);
-        textView1.setTypeface(typeFace);
-        textView2.setTypeface(typeFace);
+//        Typeface typeFace =Typeface.createFromAsset(getAssets(), "fonts/fzfsk.ttf");
+//        textView.setTypeface(typeFace);
+//        textView1.setTypeface(typeFace);
+//        textView2.setTypeface(typeFace);
         textView.setText("\n\n\n\n\n\n\n\n\n\n"+"正在加载！");
         textView1.setText("");
         textView2.setText("");
