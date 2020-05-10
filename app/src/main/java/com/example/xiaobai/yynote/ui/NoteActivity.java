@@ -161,27 +161,27 @@ public class NoteActivity extends AppCompatActivity {
         Bitmap bitmap = Bitmap.createBitmap(createWatermarkBitmap(cachebmp,
                 "@ YYNote"));
 
-        FileOutputStream fos;
-        try {
-// 判断手机设备是否有SD卡
-            boolean isHasSDCard = Environment.getExternalStorageState().equals(
-                    android.os.Environment.MEDIA_MOUNTED);
-            if (isHasSDCard) {
-// SD卡根目录
-                File sdRoot = Environment.getExternalStorageDirectory();
-                File file = new File(sdRoot, DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA)) +".PNG");
-                fos = new FileOutputStream(file);
-            } else
-                throw new Exception("创建文件失败!");
-
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
-
-            fos.flush();
-            fos.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        FileOutputStream fos;
+//        try {
+//// 判断手机设备是否有SD卡
+//            boolean isHasSDCard = Environment.getExternalStorageState().equals(
+//                    android.os.Environment.MEDIA_MOUNTED);
+//            if (isHasSDCard) {
+//// SD卡根目录
+//                File sdRoot = Environment.getExternalStorageDirectory();
+//                File file = new File(sdRoot, DateFormat.format("yyyyMMdd_HHmmss", Calendar.getInstance(Locale.CHINA)) +".PNG");
+//                fos = new FileOutputStream(file);
+//            } else
+//                throw new Exception("创建文件失败!");
+//
+//            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+//
+//            fos.flush();
+//            fos.close();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         view.destroyDrawingCache();
         return bitmap;
     }
