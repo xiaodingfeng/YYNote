@@ -19,7 +19,6 @@ import android.widget.TextView;
 
 import com.example.xiaobai.yynote.R;
 import com.example.xiaobai.yynote.bean.Note;
-import com.example.xiaobai.yynote.db.NoteDbHelpBusiness;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +27,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> im
     private static int color;
     private LinkedList<Note> notes;
     private Context mContext;
-    private  NoteDbHelpBusiness dbBus = null;
     private OnRecyclerViewItemClickListener mOnItemClickListener;
     private OnRecyclerViewItemLongClickListener mOnItemLongClickListener;
 

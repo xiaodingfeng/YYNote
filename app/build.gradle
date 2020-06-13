@@ -26,7 +26,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'lib')
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.zhihu.android:matisse:0.5.2-beta4'
@@ -38,11 +38,4 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation files('lib/commons-lang-2.1.jar')
-    implementation files('lib/commons-logging.jar')
-    implementation files('lib/ezmorph-1.0.2.jar')
-    implementation files('lib/json-lib-1.1-jdk13.jar')
-    implementation files('lib/xom-1.0d10.jar')
-    implementation files('lib/commons-beanutils.jar')
-    implementation files('lib/commons-collections-3.0.jar')
 }

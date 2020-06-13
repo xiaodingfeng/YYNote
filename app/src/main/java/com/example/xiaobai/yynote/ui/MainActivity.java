@@ -35,6 +35,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.text.SpannableString;
+import android.text.util.Linkify;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -73,9 +75,6 @@ import com.zhihu.matisse.Matisse;
 import com.zhihu.matisse.MimeType;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -84,22 +83,16 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener ,View.OnClickListener {
     NoteAdapter noteAdapter;
     NoteDbHelpBusiness dbBus;
-    NetworkUtil networkUtil;
     private Handler handler;
     private LinkedList<Note> notes;
     private String groupName = "全部";
     public  Toolbar toolbar_main;
-    ImageView imageView;
     String showNotesModel;
     RecyclerView recyclerView;
     private GlideImageEngine glideImageEngine;
     SimpleTarget<Drawable> simpleTarget;
     private int REQUEST_CODE_CHOOSE = 23;
     private int REQUEST_PERMISSION_CODE;
-    public void onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-    }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"SetTextI18n", "HandlerLeak", "WrongConstant"})
     @Override
@@ -404,7 +397,6 @@ public class MainActivity extends AppCompatActivity
         }
     };
 
-    // 根据组名groupName 刷新数据  notes 对象 ，由于groupName的变化，或者其他增删导致 数据变化 ,合理并不会对搜索框的过滤刷新
     private void refreshNotes(){
         if(groupName.equals("全部")){
             notes = dbBus.getAll();
@@ -544,7 +536,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
         fab.setVisibility(View.VISIBLE);
         if (id == R.id.nav_all) {
@@ -560,8 +551,6 @@ public class MainActivity extends AppCompatActivity
             groupName = "回收站";
             fab.setVisibility(View.INVISIBLE);
         }else if (id == R.id.nav_share) {
-//            groupName = "分享软件";
-            //由于qq，微信需要注册，所以暂时没弄 只能分享到系统自带的应用中
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
             intent.putExtra(Intent.EXTRA_TEXT, "一款界面唯美的简易便签APP\n\n" +
@@ -570,9 +559,11 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent.createChooser(intent,"分享到"));
         } else if (id == R.id.nav_aboutWriter) {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            SpannableString s=new SpannableString("华东交通大学： " +
+                    "肖定峰\n\n已开源，Github地址：https://github.com/xiaodingfeng/YYNote.git");
+            Linkify.addLinks(s, Linkify.WEB_URLS);
             AlertDialog alertDialog = builder.setTitle("关于作者：")
-                    .setMessage("华东交通大学： " +
-                            "肖定峰\n\n已开源，Github地址：https://github.com/xiaodingfeng/YYNote.git").create();
+                    .setMessage(s).create();
             alertDialog.show();
         }
         else if(id == R.id.nav_aboutApp){
@@ -604,14 +595,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void refreshAdapter(){
-        //这里应该是 输入一个组名 刷新这个组名下的 notes
-        //刷新 adapter中的数据
         noteAdapter.setNotes(notes);
     }
 
     private void changedGroup(){
-        //select 语句
-        //刷新数据
         refreshNotes();
         refreshAdapter();
     }

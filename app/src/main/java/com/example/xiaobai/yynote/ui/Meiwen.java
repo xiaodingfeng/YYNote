@@ -22,7 +22,6 @@ import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.xiaobai.yynote.R;
 import com.example.xiaobai.yynote.bean.Article;
@@ -30,10 +29,10 @@ import com.example.xiaobai.yynote.bean.Article;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class Meiwen extends AppCompatActivity {
     private Handler handler;
@@ -43,8 +42,6 @@ public class Meiwen extends AppCompatActivity {
     private TextView textView2;
     String wordSizePrefs;
     private  float pressX,pressY,moveX,moveY;
-    private String urlBefor;
-    private String urlNext;
     private String urlMeiri="https://meiriyiwen.com/random";
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint({"HandlerLeak", "ClickableViewAccessibility"})
@@ -187,7 +184,7 @@ public class Meiwen extends AppCompatActivity {
     }
 
 
-    public static Document getJsoupDocGet(String url) {
+    public  Document getJsoupDocGet(String url) {
         //三次试错
         final int MAX = 10;
         int time = 0;
@@ -219,7 +216,7 @@ public class Meiwen extends AppCompatActivity {
             public void run() {
                 try{
                     //每日一文文章网
-                    Document doc3 =getJsoupDocGet(url);
+                    Document doc3 = getJsoupDocGet(url);
                     if(doc3!=null) {
                         Element arcticle = doc3.selectFirst("div#article_show");
                         String Title = arcticle.selectFirst("h1").text();
